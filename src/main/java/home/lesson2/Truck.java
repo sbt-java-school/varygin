@@ -12,6 +12,9 @@ public class Truck {
 //        processSimple();
     }
 
+    /**
+     * method for resolve task with static params
+     */
     private static void processSimple() {
         int m = 10;
         int resCnt = 0;
@@ -26,6 +29,10 @@ public class Truck {
         System.out.println(resCnt + " " + resValue + System.lineSeparator());
     }
 
+    /**
+     * method for counting things and their summary weight
+     * @params gets from console
+     */
     private static void processConsole() {
         try (
                 BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -41,6 +48,10 @@ public class Truck {
         }
     }
 
+    /**
+     * method for counting things and their summary weight
+     * @params (static) file: input.txt and output.txt
+     */
     private static void processFile() {
         try (
                 BufferedReader reader = new BufferedReader(new FileReader("files/home/lesson2/input.txt"));
