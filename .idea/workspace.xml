@@ -2,12 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="85dd587a-5b05-4ed7-b404-27ef9f3062b7" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/home/lesson3/Main.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/home/lesson3/Truck.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/home/lesson3/TruckManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/files/home/lesson3/input.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vladimir.varygin.iml" afterPath="$PROJECT_DIR$/vladimir.varygin.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="javasbt.iws" />
@@ -537,7 +531,13 @@
       <option name="project" value="LOCAL" />
       <updated>1470932909415</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Погрузчик с очередью загрузки и несколькими грузовиками.">
+      <created>1471011857003</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1471011857003</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -585,7 +585,8 @@
     <MESSAGE value="lesson2 fix" />
     <MESSAGE value="lesson2 ignore" />
     <MESSAGE value="javadoc" />
-    <option name="LAST_COMMIT_MESSAGE" value="javadoc" />
+    <MESSAGE value="Погрузчик с очередью загрузки и несколькими грузовиками." />
+    <option name="LAST_COMMIT_MESSAGE" value="Погрузчик с очередью загрузки и несколькими грузовиками." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
