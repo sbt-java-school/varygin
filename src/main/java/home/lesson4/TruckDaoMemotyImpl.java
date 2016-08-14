@@ -10,12 +10,12 @@ import java.util.List;
 public class TruckDaoMemotyImpl implements TruckDao {
 
     private final List<Truck> trucks = new ArrayList<>(Arrays.asList(
-            new Truck(1, Truck.TruckType.KAMAZ, 10),
-            new Truck(2, Truck.TruckType.KAMAZ, 8),
-            new Truck(31, Truck.TruckType.UAZ, 20),
-            new Truck(4, Truck.TruckType.KAMAZ, 11),
-            new Truck(56, Truck.TruckType.LADA, 98),
-            new Truck(6, Truck.TruckType.ZAZ, 100)
+            new Truck<Truck.TruckType>(1, Truck.TruckType.KAMAZ, 10),
+            new Truck<Truck.TruckType>(2, Truck.TruckType.KAMAZ, 8),
+            new Truck<Truck.TruckType>(31, Truck.TruckType.UAZ, 20),
+            new Truck<Truck.TruckType>(4, Truck.TruckType.KAMAZ, 11),
+            new Truck<Truck.TruckType>(56, Truck.TruckType.LADA, 98),
+            new Truck<Truck.TruckType>(6, Truck.TruckType.ZAZ, 100)
     ));
 
     @Override
