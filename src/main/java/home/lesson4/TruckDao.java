@@ -7,5 +7,6 @@ import java.util.List;
  */
 public interface TruckDao {
 
-    List<Truck> list();
+    List<Truck> listByTypes();
+    List<Truck> listById();
 }

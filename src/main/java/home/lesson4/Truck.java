@@ -3,7 +3,7 @@ package home.lesson4;
 /**
  * Created by LL on 13.08.2016.
  */
-public class Truck <P> {
+public class Truck <P> extends BigCars {
 
     private long id;
     private int capacity;
@@ -30,7 +30,7 @@ public class Truck <P> {
     @Override
     public String toString() {
         return "Truck{" +
-                "id=" + id +
+                "id=" + id+
                 '}';
     }
 

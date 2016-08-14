@@ -10,7 +10,7 @@ public class Application {
     private Map<Long, Truck> truckRegistry = new TreeMap<>();
 
     public Application(TruckDao truckDao) {
-        List<Truck> list = truckDao.list();
+        List<Truck> list = truckDao.listByTypes();
         for (Truck truck : list) {
             Truck previouseValue = truckRegistry.put(truck.getId(), truck);
             if (null != previouseValue) {
@@ -36,12 +36,20 @@ public class Application {
     public static void main(String[] args) {
         TruckDao truckDao = new TruckDaoMemotyImpl();
 
-        TruckRegistryByParam<Truck.TruckType> truckRegistry = new TruckRegistryByParam<>(truckDao);
-        truckRegistry.viewTruckRegistry();
-        System.out.println("\nTrucks with type: " + TYPE);
+        TruckRegistryByParam<Truck, Truck.TruckType> truckRegistry = new TruckRegistryByParam<>(truckDao.listByTypes());
+        System.out.println("Trucks with type: " + TYPE);
 
         List<Truck> trucks = truckRegistry.getTrucksByType(TYPE);
         for (Truck truck : trucks) {
+            System.out.println(truck);
+        }
+        System.out.println();
+
+        TruckRegistryByParam<Truck, Long> truckRegistryByCode = new TruckRegistryByParam<>(truckDao.listById());
+        truckRegistryByCode.viewTruckRegistry();
+        System.out.println("\nTrucks with code: " + 31);
+        List<Truck> trucksByCode = truckRegistryByCode.getTrucksByType(31L);
+        for (Truck truck : trucksByCode) {
             System.out.println(truck);
         }
 

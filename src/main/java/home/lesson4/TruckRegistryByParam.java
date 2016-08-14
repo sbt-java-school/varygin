@@ -5,32 +5,33 @@ import java.util.*;
 /**
  * Created by LL on 14.08.2016.
  */
-public class TruckRegistryByParam<T> {
-    private Map<T, List<Truck>> truckRegistryByType = new HashMap<>();
+public class TruckRegistryByParam<E extends BigCars, T> {
 
-    public TruckRegistryByParam(TruckDao truckDao) {
-        List<Truck> list = truckDao.list();
+    private Map<T, List<E>> truckRegistryByParam = new HashMap<>();
 
-        for (Truck truck : list) {
-            T type = (T) truck.getField();
-            if (truckRegistryByType.containsKey(type)) {
-                truckRegistryByType.get(type).add(truck);
+    public TruckRegistryByParam(List<E> listDao) {
+        for (E item : listDao) {
+
+            T type = (T) item.getField(); //???
+
+            if (truckRegistryByParam.containsKey(type)) {
+                truckRegistryByParam.get(type).add(item);
             } else {
-                truckRegistryByType.put(type, new ArrayList<>(Arrays.asList(truck)));
+                truckRegistryByParam.put(type, new ArrayList<>(Arrays.asList(item)));
             }
         }
     }
 
     void viewTruckRegistry() {
-        for (Map.Entry<T, List<Truck>> truckListEntry : truckRegistryByType.entrySet()){
-            for (Truck truck : truckListEntry.getValue()) {
-                System.out.println(truckListEntry.getKey() + " " + truck);
+        for (Map.Entry<T, List<E>> truckListEntry : truckRegistryByParam.entrySet()){
+            for (E item : truckListEntry.getValue()) {
+                System.out.println(truckListEntry.getKey() + " " + item);
             }
         }
     }
 
-    public List<Truck> getTrucksByType(T type) {
-        List<Truck> trucks = truckRegistryByType.get(type);
+    public List<E> getTrucksByType(T type) {
+        List<E> trucks = truckRegistryByParam.get(type);
         if (trucks == null || trucks.isEmpty()) {
             throw new IllegalArgumentException("Not found truck with type=" + type);
         }
