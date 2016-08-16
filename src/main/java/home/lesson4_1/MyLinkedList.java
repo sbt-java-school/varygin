@@ -109,7 +109,6 @@ public class MyLinkedList<E> implements MyList<E> {
         private int expectedModCount = modCount;
 
         ListItr(int index) {
-            // assert isPositionIndex(index);
             next = (index == size) ? null : node(index);
             nextIndex = index;
         }
@@ -203,12 +202,45 @@ public class MyLinkedList<E> implements MyList<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        Object[] buff = c.toArray();
+        if (buff.length == 0) {
+            return false;
+        }
+
+        Node<E> pred = last;
+
+        for (Object o : buff) {
+            E item = (E) o;
+            Node<E> newNode = new Node<>(pred, item, null);
+            if (pred == null) {
+                first = newNode;
+            } else {
+                pred.next = newNode;
+            }
+            pred = newNode;
+        }
+
+        size += buff.length;
+        modCount++;
+        return true;
     }
 
     @Override
     public boolean copy(Collection<? extends E> c) {
-        return false;
+        if (c.toArray().length == 0) {
+            return false;
+        }
+
+        for (Node<E> x = first; x != null; ) {
+            Node<E> next = x.next;
+            x.item = null;
+            x.next = null;
+            x.prev = null;
+            x = next;
+        }
+        first = last = null;
+        size = 0;
+        return addAll(c);
     }
 
     private static class Node<E> {
