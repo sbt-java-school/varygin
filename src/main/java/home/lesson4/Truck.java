@@ -3,16 +3,20 @@ package home.lesson4;
 /**
  * Created by LL on 13.08.2016.
  */
-public class Truck {
+public class Truck <P> extends BigCars {
 
     private long id;
-    private TruckType type;
     private int capacity;
+    private P field;
 
-    public Truck(long id, TruckType type, int capacity) {
+    public Truck(long id, P field, int capacity) {
         this.id = id;
-        this.type = type;
         this.capacity = capacity;
+        this.field = field;
+    }
+
+    public P getField() {
+        return field;
     }
 
     public long getId() {
@@ -23,14 +27,10 @@ public class Truck {
         return capacity;
     }
 
-    public TruckType getType() {
-        return type;
-    }
-
     @Override
     public String toString() {
         return "Truck{" +
-                "id=" + id +
+                "id=" + id+
                 '}';
     }
 

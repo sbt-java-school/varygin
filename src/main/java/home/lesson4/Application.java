@@ -10,7 +10,7 @@ public class Application {
     private Map<Long, Truck> truckRegistry = new TreeMap<>();
 
     public Application(TruckDao truckDao) {
-        List<Truck> list = truckDao.list();
+        List<Truck> list = truckDao.listByTypes();
         for (Truck truck : list) {
             Truck previouseValue = truckRegistry.put(truck.getId(), truck);
             if (null != previouseValue) {
@@ -35,62 +35,27 @@ public class Application {
     }
     public static void main(String[] args) {
         TruckDao truckDao = new TruckDaoMemotyImpl();
-        Application application = new Application(truckDao);
 
-        List<Truck> list = truckDao.list();
+        TruckRegistryByParam<Truck, Truck.TruckType> truckRegistry = new TruckRegistryByParam<>(truckDao.listByTypes());
+        System.out.println("Trucks with type: " + TYPE);
 
-        /*Iterator<Truck> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            Truck truck = iterator.next();
-            if (truck.getCapacity() < 20) {
-                iterator.remove();
-            }
-        }*/
-        //==
-        /*for (Truck truck : new ArrayList<>(list)) {
-            if (truck.getCapacity() < 20) {
-                list.remove(truck);
-            }
-        }*/
-        //==
-        /*for (Iterator<Truck> iterator = list.iterator(); iterator.hasNext(); iterator.next()) {
-            Truck truck = iterator.next();
-            if (truck.getCapacity() < 20) {
-                iterator.remove();
-            }
-        }
-        System.out.println(list);*/
-
-        /*if (args.length != 1) {
-            printHelp();
-            System.exit(-1);
-        }
-
-        application.viewTruckRegistry();
-
-        List<Truck> list = truckDao.list();
-        System.out.println(list);
-
-        list.add(new Truck(121, 153));
-        System.out.println(list);
-
-        List<Truck> list1 = truckDao.list();
-        System.out.println(list1);
-
-        Map<Integer, String> integerStringMap = Collections.singletonMap(1, "234");*/
-
-        TruckRegistryByType truckRegistryByType = new TruckRegistryByType(truckDao);
-        truckRegistryByType.viewTruckRegistry();
-        System.out.println("\nTrucks with type: " + TYPE);
-
-        List<Truck> trucks = truckRegistryByType.getTrucksByType(TYPE);
+        List<Truck> trucks = truckRegistry.getByParam(TYPE);
         for (Truck truck : trucks) {
+            System.out.println(truck);
+        }
+        System.out.println();
+
+        TruckRegistryByParam<Truck, Long> truckRegistryByCode = new TruckRegistryByParam<>(truckDao.listById());
+        truckRegistryByCode.viewTruckRegistry();
+        System.out.println("\nTrucks with code: " + 31);
+        List<Truck> trucksByCode = truckRegistryByCode.getByParam(31L);
+        for (Truck truck : trucksByCode) {
             System.out.println(truck);
         }
 
     }
 
     private static void printHelp() {
-        System.out.println("User first argument sa truck ID");
+        System.out.println("Use first argument as truck ID");
     }
 }
