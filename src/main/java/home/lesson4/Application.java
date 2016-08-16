@@ -7,48 +7,46 @@ import java.util.*;
  */
 public class Application {
     public static final Truck.TruckType TYPE = Truck.TruckType.KAMAZ;
+    public static final Truck.TruckType LADA = Truck.TruckType.LADA;
     private Map<Long, Truck> truckRegistry = new TreeMap<>();
 
-    public Application(TruckDao truckDao) {
-        List<Truck> list = truckDao.listByTypes();
-        for (Truck truck : list) {
-            Truck previouseValue = truckRegistry.put(truck.getId(), truck);
-            if (null != previouseValue) {
-                throw new IllegalStateException("Two trucks with same id");
-            }
-        }
-
-    }
-
-    void viewTruckRegistry() {
-        for (Map.Entry<Long, Truck> truckEntry : truckRegistry.entrySet()){
-            System.out.println(truckEntry.getKey() + ": " + truckEntry.getValue());
-        }
-    }
-
-    public Truck getTruckbyId(long truckId) {
-        Truck truck = truckRegistry.get(truckId);
-        if (truck == null) {
-            throw new IllegalArgumentException("Not found truck with id=" + truckId);
-        }
-        return truck;
-    }
     public static void main(String[] args) {
         TruckDao truckDao = new TruckDaoMemotyImpl();
 
-        TruckRegistryByParam<Truck, Truck.TruckType> truckRegistry = new TruckRegistryByParam<>(truckDao.listByTypes());
-        System.out.println("Trucks with type: " + TYPE);
 
-        List<Truck> trucks = truckRegistry.getByParam(TYPE);
+        /*Мультимап по типу*/
+        System.out.println("Trucks bu type with type: " + LADA);
+        TruckRegistry<Truck.TruckType, Truck> truckRegistryType = new TruckRegistryByType();
+        for (Truck truck : truckDao.listByTypes()) {
+            truckRegistryType.put((Truck.TruckType) truck.getField(), truck);
+        }
+        List<Truck> list = truckRegistryType.get(LADA);
+        for (Truck truck : list) {
+            System.out.println(truck);
+        }
+        System.out.println("\n");
+
+
+        /*Параметризированный мультимап*/
+        TruckRegistry<Truck.TruckType, Truck> truckRegistry = new TruckRegistryByParam<>();
+        for (Truck truck : truckDao.listByTypes()) {
+            truckRegistry.put((Truck.TruckType) truck.getField(), truck);
+        }
+        System.out.println("Trucks with type: " + TYPE);
+        List<Truck> trucks = truckRegistry.get(TYPE);
         for (Truck truck : trucks) {
             System.out.println(truck);
         }
         System.out.println();
 
-        TruckRegistryByParam<Truck, Long> truckRegistryByCode = new TruckRegistryByParam<>(truckDao.listById());
-        truckRegistryByCode.viewTruckRegistry();
+
+        TruckRegistryByParam<Long, Truck> truckRegistry1 = new TruckRegistryByParam<>();
+        for (Truck truck : truckDao.listById()) {
+            truckRegistry1.put((Long) truck.getField(), truck);
+        }
+        truckRegistry1.viewTruckRegistry();
         System.out.println("\nTrucks with code: " + 31);
-        List<Truck> trucksByCode = truckRegistryByCode.getByParam(31L);
+        List<Truck> trucksByCode = truckRegistry1.get(31L);
         for (Truck truck : trucksByCode) {
             System.out.println(truck);
         }
