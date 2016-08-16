@@ -39,7 +39,7 @@ public class Application {
         TruckRegistryByParam<Truck, Truck.TruckType> truckRegistry = new TruckRegistryByParam<>(truckDao.listByTypes());
         System.out.println("Trucks with type: " + TYPE);
 
-        List<Truck> trucks = truckRegistry.getTrucksByType(TYPE);
+        List<Truck> trucks = truckRegistry.getByParam(TYPE);
         for (Truck truck : trucks) {
             System.out.println(truck);
         }
@@ -48,7 +48,7 @@ public class Application {
         TruckRegistryByParam<Truck, Long> truckRegistryByCode = new TruckRegistryByParam<>(truckDao.listById());
         truckRegistryByCode.viewTruckRegistry();
         System.out.println("\nTrucks with code: " + 31);
-        List<Truck> trucksByCode = truckRegistryByCode.getTrucksByType(31L);
+        List<Truck> trucksByCode = truckRegistryByCode.getByParam(31L);
         for (Truck truck : trucksByCode) {
             System.out.println(truck);
         }
