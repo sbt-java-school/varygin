@@ -11,21 +11,14 @@ public class TruckRegistryByParam<T, E extends BigCars> implements TruckRegistry
 
     private Map<T, List<E>> truckRegistryByParam = new HashMap<>();
 
-    public TruckRegistryByParam() {
-    }
-
-    /**
-     * Multimap constructor
-     * @param listDao list of some objects
-     */
-    public TruckRegistryByParam(List<E> listDao) {
-        for (E item : listDao) {
-            T type = (T) item.getField(); //ћожно ли как-то проверить соответствие типов?
-            put(type, item);
-        }
-    }
-
     public void put(T key, E value) {
+        if (key == null) {
+            throw new IllegalStateException("Wrong key");
+        }
+        if (value == null) {
+            throw new IllegalStateException("Element with key " + key + " is null");
+        }
+
         if (truckRegistryByParam.containsKey(key)) {
             truckRegistryByParam.get(key).add(value);
         } else {
@@ -45,13 +38,15 @@ public class TruckRegistryByParam<T, E extends BigCars> implements TruckRegistry
     }
 
     /**
-     *
      * Search in multimap list of Object by param
      *
      * @param key to search list of Objects
      * @return list of Objects
      */
     public List<E> get(T key) {
+        if (key == null) {
+            throw new IllegalStateException("Wrong key");
+        }
         List<E> items = truckRegistryByParam.get(key);
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("Not found truck with key=" + key);

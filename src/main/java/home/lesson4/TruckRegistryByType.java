@@ -9,10 +9,6 @@ public class TruckRegistryByType implements TruckRegistry<Truck.TruckType, Truck
 
     private Map<Truck.TruckType, List<Truck>> truckRegistryByType = new HashMap<>();
 
-
-    public TruckRegistryByType() {
-    }
-
     @Override
     public List<Truck> get(Truck.TruckType type) {
         List<Truck> items = truckRegistryByType.get(type);
@@ -24,6 +20,12 @@ public class TruckRegistryByType implements TruckRegistry<Truck.TruckType, Truck
 
     @Override
     public void put(Truck.TruckType key, Truck value) {
+        if (key == null) {
+            throw new IllegalStateException("Wrong key " + key);
+        }
+        if (value == null) {
+            throw new IllegalStateException("Truck with key " + key + " is null");
+        }
         if (truckRegistryByType.containsKey(key)) {
             truckRegistryByType.get(key).add(value);
         } else {
