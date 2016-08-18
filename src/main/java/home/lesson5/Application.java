@@ -7,10 +7,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by LL on 18.08.2016.
+ * Application for getting page content by URL
+ * which is entered from the console.
  */
 public class Application {
 
+    /**
+     *
+     * @param url String from console
+     * @return <code>true</code> in success of reading content
+     *         <code>false</code> otherwise
+     * @throws BusinessExceptions
+     */
     private static boolean readContent(String url) throws BusinessExceptions {
         try {
             URL resource = new URL(url);
@@ -28,6 +36,8 @@ public class Application {
         }
         return true;
     }
+
+
     public static void main(String[] args) throws Exception{
         boolean success = false;
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
