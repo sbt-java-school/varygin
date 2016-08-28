@@ -1,14 +1,9 @@
 package home.lesson6;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 
-/**
- * Created by LL on 28.08.2016.
- */
 public class Printer {
     private Class<?> currentClass;
 
@@ -80,8 +75,8 @@ public class Printer {
     private HashMap<String, Method> getMethodsMap(Method[] declaredMethods) {
         HashMap<String, Method> methodsMap = new HashMap<>();
         if (declaredMethods != null && declaredMethods.length > 0) {
-            for (int i = 0; i < declaredMethods.length; i++) {
-                methodsMap.put(declaredMethods[i].getName(), declaredMethods[i]);
+            for (Method declaredMethod : declaredMethods) {
+                methodsMap.put(declaredMethod.getName(), declaredMethod);
             }
         }
         return methodsMap;
