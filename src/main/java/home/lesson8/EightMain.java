@@ -1,5 +1,7 @@
 package home.lesson8;
 
+import home.lesson8.utils.ProxyUtils;
+
 /**
  * Main class for testing
  */
