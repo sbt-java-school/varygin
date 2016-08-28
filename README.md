@@ -5,7 +5,7 @@
 
 Лекция №8.
 Домашнее задание: Реализовать кэширующий прокси.
-Реализация: src/main/java/home/lesson8
+Реализация: <a href="https://github.com/sbt-java-school/vladimir.varygin/tree/master/src/main/java/home/lesson8">src/main/java/home/lesson8</a>
 
 EightMain - Класс для запуска и тестирования программы (содержит метод main).
 
