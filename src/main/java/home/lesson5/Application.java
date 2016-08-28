@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Application for getting page content by URL
+ * SixMain for getting page content by URL
  * which is entered from the console.
  */
 public class Application {
