@@ -1,4 +1,4 @@
-package home.lesson6;
+package home.lesson6.utils;
 
 import java.lang.reflect.*;
 import java.util.HashMap;

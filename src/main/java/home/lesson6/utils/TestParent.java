@@ -1,9 +1,12 @@
-package home.lesson6;
+package home.lesson6.utils;
 
 /**
- * Created by LL on 28.08.2016.
+ * Some Parent class
  */
 public class TestParent {
+
+
+
     public void method() {
 
     }

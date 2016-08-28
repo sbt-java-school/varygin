@@ -1,4 +1,6 @@
-package home.lesson6;
+package home.lesson6.part1;
+
+import home.lesson6.utils.Printer;
 
 /**
  * Print all fields, constructors, methods and superclasses by classname in first argument of program
