@@ -9,10 +9,10 @@ import java.util.Stack;
 /**
  * Created by LL on 28.08.2016.
  */
-public class ClassPrinter {
+public class Printer {
     private Class<?> currentClass;
 
-    public ClassPrinter(String className) throws ClassNotFoundException {
+    public Printer(String className) throws ClassNotFoundException {
         currentClass = Class.forName(className);
     }
 

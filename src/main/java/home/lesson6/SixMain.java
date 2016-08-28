@@ -1,7 +1,5 @@
 package home.lesson6;
 
-import com.sun.deploy.net.proxy.ProxyUtils;
-
 /**
  * Print all fields, constructors, methods and superclasses by classname in first argument of program
  */
@@ -18,7 +16,7 @@ public class SixMain {
      */
     public static void main(String[] args) throws Exception {
         try {
-            ClassPrinter classPrinter = new ClassPrinter(args[0]);
+            Printer classPrinter = new Printer(args[0]);
             classPrinter.print();
 
             classPrinter.printGetters();
