@@ -9,47 +9,54 @@ import java.util.HashMap;
 /**
  * Cached Proxy Handler
  */
-public class CacheInvocationHandler implements InvocationHandler {
-    public static final String TIME_KEY = "time";
-    public static final String VALUE_KEY = "value";
+public class CacheInvocationHandler <T> implements InvocationHandler {
     private Calculator instance;
+    private HashMap<String, Values<T>> cacheMap = new HashMap<>();
 
     public CacheInvocationHandler(Calculator instance) {
         this.instance = instance;
     }
 
-    private static HashMap<String, HashMap<String, Number>> cacheMap = new HashMap<>();
+    private static class Values <V> {
+        private long time;
+        private V value;
+
+        public Values(long time, V value) {
+            this.time = time;
+            this.value = value;
+        }
+
+        public boolean checkTime() {
+            return System.currentTimeMillis() < time;
+        }
+
+        public V getValue() {
+            return value;
+        }
+    }
 
     @Override
-    public Integer invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        int value;
+    public T invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        T value;
         long cacheTime = getCacheTime(method);
         if (cacheTime != 0) {
             String key = getCacheKey(method, args);
             if (cacheMap.containsKey(key)) {
-                HashMap<String, Number> valueMap = cacheMap.get(key);
-                if (System.currentTimeMillis() < ((long) valueMap.get(TIME_KEY))) {
-                    System.out.println("--Get sum from chache--");
-                    return (int) valueMap.get(VALUE_KEY);
+                if (cacheMap.get(key).checkTime()) {
+                    System.out.println("--Get value from chache--");
+                    return (T) cacheMap.get(key).getValue();
                 } else {
-                    System.out.println("--Clear cache--");
+                    System.out.println("--Clear cache for one variable--");
                     cacheMap.put(key, null);
                 }
             }
 
-            value = (int) method.invoke(instance, args);
-            store(key, value, cacheTime);
+            value = (T) method.invoke(instance, args);
+            cacheMap.put(key, new Values<T>(System.currentTimeMillis() + cacheTime, value));
         } else {
-            value = (int) method.invoke(instance, args);
+            value = (T) method.invoke(instance, args);
         }
         return value;
-    }
-
-    private void store(String key, int value, long cacheTime) {
-        HashMap<String, Number> valueMap = new HashMap<>();
-        valueMap.put(TIME_KEY, System.currentTimeMillis() + cacheTime);
-        valueMap.put(VALUE_KEY, value);
-        cacheMap.put(key, valueMap);
     }
 
     private String getCacheKey(Method method, Object[] args) {

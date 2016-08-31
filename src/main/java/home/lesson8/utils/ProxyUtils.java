@@ -18,6 +18,6 @@ public class ProxyUtils {
         return (Calculator) Proxy.newProxyInstance(
                 EightMain.class.getClassLoader(),
                 new Class<?>[]{Calculator.class},
-                new CacheInvocationHandler(classInstance));
+                new CacheInvocationHandler<Integer>(classInstance));
     }
 }
