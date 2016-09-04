@@ -1,3 +1,10 @@
 out
 .idea
 vladimir.varygin.iml
+lesson9/core/core.iml
+lesson9/core/src/main/resources/
+lesson9/core/src/test/
+lesson9/core/target/
+lesson9/lesson9.iml
+lesson9/utils/target/
+lesson9/utils/utils.iml
