@@ -1,4 +1,4 @@
-package ru.lesson11;
+package ru.sbt;
 
 import java.io.IOException;
 
