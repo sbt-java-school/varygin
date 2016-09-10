@@ -1,5 +1,5 @@
-out
 .idea
+files
 vladimir.varygin.iml
 lesson9/core/core.iml
 lesson9/core/src/main/resources/
@@ -8,3 +8,16 @@ lesson9/core/target/
 lesson9/lesson9.iml
 lesson9/utils/target/
 lesson9/utils/utils.iml
+lesson10/lesson10.iml
+lesson10/target/
+lesson11/core/core.iml
+lesson11/core/src/main/resources/
+lesson11/core/target/
+lesson11/lesson11.iml
+lesson11/utils/src/main/resources/
+lesson11/utils/src/test/
+lesson11/utils/target/
+lesson11/utils/utils.iml
+old/old.iml
+old/src/main/resources/
+old/src/test/
