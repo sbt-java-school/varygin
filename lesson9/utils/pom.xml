@@ -4,10 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>home.work</groupId>
-    <artifactId>utils</artifactId>
+    <groupId>lesson9.utils</groupId>
+    <artifactId>lesson9.utils</artifactId>
     <packaging>jar</packaging>
     <version>1.0.9</version>
+
     <build>
         <plugins>
             <plugin>

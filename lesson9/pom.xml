@@ -4,13 +4,26 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>mainGrouo</groupId>
+    <groupId>ru.sbt.lesson9</groupId>
     <artifactId>lesson9</artifactId>
     <packaging>pom</packaging>
     <version>1.0.9</version>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <modules>
-        <module>utils</module>
-        <module>core</module>
+        <module>l9utils</module>
+        <module>l9core</module>
     </modules>
 </project>
