@@ -5,13 +5,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class Streams<IN, OUT> extends PipeLine<IN, OUT> {
+public class Streams<T_IN, T_OUT> extends PipeLine<T_IN, T_OUT> {
 
-    Streams(List<OUT> source) {
+    private Streams(List<T_OUT> source) {
         super(source);
     }
 
-    Streams(PipeLine<?, IN> upstream) {
+    private Streams(PipeLine<?, T_IN> upstream) {
         super(upstream);
     }
 
@@ -25,13 +25,13 @@ public class Streams<IN, OUT> extends PipeLine<IN, OUT> {
         return new Streams<>(items);
     }
 
-    public Streams<OUT, OUT> filter(Predicate<? super OUT> predicate) {
+    public Streams<T_OUT, T_OUT> filter(Predicate<? super T_OUT> predicate) {
         Objects.requireNonNull(predicate);
-        return new Streams<OUT, OUT>(this) {
-            Wrap<OUT> unWrap(Wrap<OUT> wrap) {
-                return new Wrap.Chain<OUT, OUT>(wrap) {
+        return new Streams<T_OUT, T_OUT>(this) {
+            Wrap<T_OUT> unWrap(Wrap<T_OUT> wrap) {
+                return new Wrap.Chain<T_OUT, T_OUT>(wrap) {
                     @Override
-                    public void accept(OUT item) {
+                    public void accept(T_OUT item) {
                         if (predicate.test(item)) {
                             stream.accept(item);
                         }
@@ -41,24 +41,12 @@ public class Streams<IN, OUT> extends PipeLine<IN, OUT> {
         };
     }
 
-    public void forEach(Consumer<? super OUT> action) {
-        Objects.requireNonNull(action);
-        for (OUT in : this.getSource()) {
-            wrapWrap(new Wrap.Chain<OUT, OUT>() {
-                         public void accept(OUT item) {
-                             action.accept(item);
-                         }
-                     }
-            ).accept(in);
-        }
-    }
-
-    public <R> Streams<OUT, R> transform(Function<? super OUT, ? extends R> mapper) {
-        return new Streams<OUT, R>(this) {
-            Wrap<OUT> unWrap(Wrap<R> wrap) {
-                return new Wrap.Chain<OUT, R>(wrap) {
+    public <R> Streams<T_OUT, R> transform(Function<? super T_OUT, ? extends R> mapper) {
+        return new Streams<T_OUT, R>(this) {
+            Wrap<T_OUT> unWrap(Wrap<R> wrap) {
+                return new Wrap.Chain<T_OUT, R>(wrap) {
                     @Override
-                    public void accept(OUT item) {
+                    public void accept(T_OUT item) {
                         stream.accept(mapper.apply(item));
                     }
                 };
@@ -66,20 +54,41 @@ public class Streams<IN, OUT> extends PipeLine<IN, OUT> {
         };
     }
 
-    public <K, V> Map<K, V> toMap(Function<? super OUT, ? extends K> keyMapper,
-                                  Function<? super OUT, ? extends V> valueMapper) {
+    /**
+     * Terminate operation for creating Map from stream
+     *
+     * @param keyMapper   lambda for keys
+     * @param valueMapper lambda for values
+     * @param <K>         type of key
+     * @param <V>         type of value param
+     * @return HashMap<K,V>
+     */
+    public <K, V> Map<K, V> toMap(Function<? super T_OUT, ? extends K> keyMapper,
+                                  Function<? super T_OUT, ? extends V> valueMapper) {
         Objects.requireNonNull(keyMapper);
         Objects.requireNonNull(valueMapper);
-        HashMap<K, V> kvHashMap = new HashMap<>();
-        for (OUT in : this.getSource()) {
-            wrapWrap(new Wrap.Chain<OUT, OUT>() {
-                         @Override
-                         public void accept(OUT item) {
-                             kvHashMap.put(keyMapper.apply(item), valueMapper.apply(item));
-                         }
-                     }
-            ).accept(in);
-        }
-        return kvHashMap;
+        HashMap<K, V> hashMap = new HashMap<>();
+        acceptAll(processWrap(new Wrap.Chain<T_OUT, T_OUT>() {
+            @Override
+            public void accept(T_OUT item) {
+                hashMap.put(keyMapper.apply(item), valueMapper.apply(item));
+            }
+        }));
+        return hashMap;
+    }
+
+    /**
+     * Terminate operation for iterate source of stream
+     *
+     * @param action - operation for apply to each element of stream source
+     */
+    public void forEach(Consumer<? super T_OUT> action) {
+        Objects.requireNonNull(action);
+
+        acceptAll(processWrap(new Wrap.Chain<T_OUT, T_OUT>() {
+            public void accept(T_OUT item) {
+                action.accept(item);
+            }
+        }));
     }
 }

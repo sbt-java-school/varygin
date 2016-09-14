@@ -5,7 +5,6 @@ import java.util.Objects;
 
 abstract class PipeLine<P_IN, E_OUT> {
     private List<E_OUT> source;
-    private PipeLine next;
     private PipeLine current;
     private PipeLine prev;
     private int depth;
@@ -18,15 +17,13 @@ abstract class PipeLine<P_IN, E_OUT> {
     }
 
     PipeLine(PipeLine<?, P_IN> previous) {
-        previous.next = this;
-
         this.prev = previous;
         this.current = previous.current;
         this.depth = previous.depth + 1;
     }
 
     @SuppressWarnings("unchecked")
-    final <E_IN> Wrap<E_IN> wrapWrap(Wrap<E_OUT> wrap) {
+    final <E_IN> Wrap<E_IN> processWrap(Wrap<E_OUT> wrap) {
         Objects.requireNonNull(wrap);
 
         for (@SuppressWarnings("rawtypes") PipeLine p = PipeLine.this; p.depth > 0; p = p.prev) {
@@ -35,11 +32,16 @@ abstract class PipeLine<P_IN, E_OUT> {
         return (Wrap<E_IN>) wrap;
     }
 
-    Wrap<P_IN> unWrap(Wrap<E_OUT> wrap) {
-        throw new IllegalStateException();
+    final void acceptAll(Wrap<E_OUT> wrap) {
+        Objects.requireNonNull(wrap);
+
+        List<E_OUT> list = this.current.source;
+        for (E_OUT element : list) {
+            wrap.accept(element);
+        }
     }
 
-    public List<E_OUT> getSource() {
-        return this.current.source;
+    Wrap<P_IN> unWrap(Wrap<E_OUT> wrap) {
+        throw new IllegalStateException();
     }
 }
