@@ -1,17 +1,11 @@
 package lesson14.home;
 
-import lesson14.home.utils.Job;
 import lesson14.home.utils.JobDao;
 import lesson14.home.utils.JobDaoImpl;
 import lesson14.home.utils.Task;
 import org.junit.Test;
 
-import java.sql.Time;
-import java.time.LocalTime;
-import java.time.Period;
-import java.time.temporal.TemporalUnit;
 import java.util.Queue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Test Thread Pool
