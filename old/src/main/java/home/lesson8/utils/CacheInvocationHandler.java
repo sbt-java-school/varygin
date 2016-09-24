@@ -5,16 +5,17 @@ import home.lesson8.Calculator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Cached Proxy Handler
  */
 public class CacheInvocationHandler <T> implements InvocationHandler {
     private Calculator instance;
-    private HashMap<String, Values<T>> cacheMap = new HashMap<>();
-
+    private ConcurrentHashMap cacheMap = new ConcurrentHashMap(new HashMap < String, Values < T >>());
     public CacheInvocationHandler(Calculator instance) {
         this.instance = instance;
+
     }
 
     private static class Values <V> {
