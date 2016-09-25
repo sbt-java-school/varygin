@@ -4,7 +4,7 @@ import home.lesson8.Calculator;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,10 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheInvocationHandler <T> implements InvocationHandler {
     private Calculator instance;
-    private ConcurrentHashMap cacheMap = new ConcurrentHashMap(new HashMap < String, Values < T >>());
+    private Map<String, Values<T>> cacheMap = new ConcurrentHashMap<>();
     public CacheInvocationHandler(Calculator instance) {
         this.instance = instance;
-
     }
 
     private static class Values <V> {
@@ -48,7 +47,7 @@ public class CacheInvocationHandler <T> implements InvocationHandler {
                     return (T) cacheMap.get(key).getValue();
                 } else {
                     System.out.println("--Clear cache for one variable--");
-                    cacheMap.put(key, null);
+                    cacheMap.remove(key);
                 }
             }
 
