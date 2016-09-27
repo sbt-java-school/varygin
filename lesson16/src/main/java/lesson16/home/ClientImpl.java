@@ -1,58 +1,63 @@
 package lesson16.home;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
+import java.util.Optional;
 
+/**
+ * Класс для моделирования действий клиента в парикмахерской
+ */
 public class ClientImpl implements Client {
-    private final long timeToCheck;
+    private final int timeToCheck;
     private static final Reception reception = ReceptionImpl.getInstance();
-    private static final Lock lock = reception.getCommonLock();
+    private static final Object commonLock = reception.getCommonLock();
     private String name;
 
-    public ClientImpl(long timeToCheck, String name) {
+    public ClientImpl(int timeToCheck, String name) {
         this.timeToCheck = timeToCheck;
         this.name = name;
     }
 
     @Override
     public void run() {
-        log("client start");
+        log("входит");
         checkHairDresser();
     }
 
     private void checkHairDresser() {
-        synchronized (lock) {
+        synchronized (commonLock) {
             try {
-                TimeUnit.SECONDS.sleep(timeToCheck);
-                boolean enter = false;
-                for (HairDresser hairDresser : reception.getHeirDressers()) {
-                    if (hairDresser.getStatus().equals(Status.SLEEP)) {
-                        log("waking up");
-                        enter = true;
-                        hairDresser.setClient(this);
-                        hairDresser.wakeUp().signal();
-                        break;
-                    }
-                }
-                if (!enter) {
+                process();
+                Optional<HairDresser> first = reception.getHeirDressers().filter(HairDresser::isSleeping).findFirst();
+                if (first.isPresent() && reception.prepareClient(this)) {
+                    HairDresser hairDresser = first.get();
+                    log("будит парикмахера " + hairDresser.getName());
+                    hairDresser.wakeUp();
+                } else {
                     trySitToChair();
                 }
             } catch (InterruptedException e) {
-                //ignore
+                log("не смог разбудить");
+                trySitToChair();
             }
+        }
+    }
+
+    private void process() {
+        double k = 1.0;
+        for (int i = 0; i < timeToCheck * 100000; i++) {
+            k = Math.random() * 10 + 10564;
         }
     }
 
     private void trySitToChair() {
         if (reception.addClient(this)) {
-            log("sit down");
+            log("садится на стул");
         } else {
-            log("walk away");
+            log("уходит");
         }
     }
 
     private void log(String mess) {
-        System.out.println("Client " + Thread.currentThread().getName() + ": " + mess);
+        System.out.println("Клиент " + name + ": " + mess);
     }
 
     public String getName() {

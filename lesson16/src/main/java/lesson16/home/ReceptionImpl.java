@@ -8,18 +8,26 @@ import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
+/**
+ * Класс для моделирования работы парикмахерской
+ * Здесь ведётся учёт всех клиентов и запуск всех парикмахеров и возможность досрочного их роспуска
+ * Первоначальные настройки берутся из файла conf.properties, где
+ *      countWorker - количество парикмахеров
+ *      countChairs - количество доступных стульев в приёмной
+ */
 final class ReceptionImpl implements Reception {
     private static Reception instance;
 
     private static final Lock lock  = new ReentrantLock();
-    private final Lock checkLock = new ReentrantLock();
+    private final Object checkLock = new Object();
     private final CountDownLatch latch;
 
     private final BlockingQueue<Client> queue;
+    private final BlockingQueue<Client> newClientList = new ArrayBlockingQueue<>(1);
     private final List<HairDresser> hairDressers;
     private final List<Thread> threads;
 
@@ -33,8 +41,9 @@ final class ReceptionImpl implements Reception {
         List<HairDresser> workersList = new ArrayList<>(workers);
         List<Thread> threadList = new ArrayList<>(workers);
         for (int i = 0; i < workers; i++) {
-            HairDresser worker = new HairDresserImpl(checkLock, checkLock.newCondition(), latch);
-            Thread thread = new Thread(worker, "" + i);
+            HairDresser worker = new HairDresserImpl(checkLock, latch, Integer.toString(i + 1));
+            Thread thread = new Thread(worker);
+            thread.setPriority(Thread.MAX_PRIORITY);
             threadList.add(thread);
             workersList.add(worker);
         }
@@ -85,19 +94,31 @@ final class ReceptionImpl implements Reception {
         return queue.offer(client);
     }
 
-    public Lock getCommonLock() {
+    public boolean prepareClient(Client client) {
+        return newClientList.offer(client);
+    }
+
+    public Client takeClient() {
+        return newClientList.poll();
+    }
+
+    public Object getCommonLock() {
         return checkLock;
     }
 
-    public List<HairDresser> getHeirDressers() {
-        return hairDressers;
+    public Stream<HairDresser> getHeirDressers() {
+        return hairDressers.stream();
     }
 
     public void end() {
         threads.forEach(Thread::interrupt);
     }
 
+    public boolean thereIsClients() {
+        return queue.size() > 0;
+    }
+
     private static void log(String mess) {
-        System.out.println("Reception: " + mess);
+        System.out.println("Ресепшн: " + mess);
     }
 }

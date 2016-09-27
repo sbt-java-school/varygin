@@ -1,12 +1,60 @@
 package lesson16.home;
 
-import java.util.List;
-import java.util.concurrent.locks.Lock;
+import java.util.stream.Stream;
 
+
+/**
+ * Интерфейс по взаимодействию с парикмахерской
+ */
 public interface Reception {
+    /**
+     * Попытка пригласить клиента парикмахером
+     * @return первый севший на стул клиент
+     */
     Client getClient();
+
+    /**
+     * Попытка клиентом занять стул
+     * @param client клиент
+     * @return true - если сесть удалось, false - иначе
+     */
     boolean addClient(Client client);
-    Lock getCommonLock();
-    List<HairDresser> getHeirDressers();
+
+    /**
+     * Подготовка клиента к стрижке.
+     * Когда парикмахер окончательно проснётся - он приглашает этого клиента
+     * @param client клиент, который разбудил парикмахера
+     * @return true - если нет клиента, который умудрился пройти без очереди, false - иначе
+     */
+    boolean prepareClient(Client client);
+
+    /**
+     * Проверка парикмахером наличия клиентов,
+     * чтобы в случае его отсутствия длительного времени - уйти домой пораньше
+     * @return
+     */
+    boolean thereIsClients();
+
+    /**
+     * Приглашение клиента парикмахером после сна
+     * @return клиент, ожидающий приглашения
+     */
+    Client takeClient();
+
+    /**
+     * Интерфейс по получению клиентом возможности проверить спит(спят) ли парикмахер(ы)
+     * @return объект для блокировки
+     */
+    Object getCommonLock();
+
+    /**
+     * Получение клиентом стрима для проверки спящих парикмахеров
+     * @return stream парикмахеров
+     */
+    Stream<HairDresser> getHeirDressers();
+
+    /**
+     * Роспуск парикмахеров по домам
+     */
     void end();
 }

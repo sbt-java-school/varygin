@@ -1,18 +1,14 @@
 package lesson16.home;
 
-import java.util.concurrent.TimeUnit;
-
 public class TestSalon {
 
     public static void main(String[] args) throws InterruptedException {
-        Reception reception = ReceptionImpl.getInstance();
-
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             Thread thread = new Thread(new ClientImpl(i, "" + (i + 1)));
+            thread.setPriority(Thread.MIN_PRIORITY);
             thread.start();
 
-            TimeUnit.SECONDS.sleep(1);
+//            TimeUnit.SECONDS.sleep((int) (random() * 5));
         }
-        //reception.end();
     }
 }
