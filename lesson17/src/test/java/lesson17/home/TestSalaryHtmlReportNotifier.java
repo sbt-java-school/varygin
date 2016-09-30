@@ -7,6 +7,7 @@ import lesson17.home.dao.SalaryPaymentJdbcDao;
 import lesson17.home.model.SalaryPayment;
 import lesson17.home.sender.EmailSender;
 import lesson17.home.sender.Sender;
+import lesson17.home.utils.DateRange;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -60,13 +62,17 @@ public class TestSalaryHtmlReportNotifier {
 
     @Test
     public void test() throws Exception {
+        DateRange range = new DateRange(new Date(), new Date());
         SalaryHtmlReportNotifier notifier = new SalaryHtmlReportNotifier(salaryPaymentDao, reportBuilder, sender);
-        notifier.generateAndSendHtmlSalaryReport("10", new Date(), new Date(), "somebody@gmail.com");
+        notifier.generateAndSendHtmlSalaryReport("10", range, "somebody@gmail.com");
 
+        assertEquals(getSendedMessageFromMock(), expectedReportContent);
+    }
+
+    private String getSendedMessageFromMock() throws MessagingException {
         ArgumentCaptor<String> messageTextArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockMimeMessageHelper).setText(messageTextArgumentCaptor.capture(), anyBoolean());
-
-        assertEquals(messageTextArgumentCaptor.getValue(), expectedReportContent);
+        return messageTextArgumentCaptor.getValue();
     }
 
     private Connection getMockedConnection() throws SQLException {

@@ -4,8 +4,8 @@ import lesson17.home.builder.ReportBuilder;
 import lesson17.home.dao.SalaryPaymentDao;
 import lesson17.home.model.SalaryPayment;
 import lesson17.home.sender.Sender;
+import lesson17.home.utils.DateRange;
 
-import java.util.Date;
 import java.util.List;
 
 public class SalaryHtmlReportNotifier {
@@ -19,8 +19,8 @@ public class SalaryHtmlReportNotifier {
         this.sender = sender;
     }
 
-    public void generateAndSendHtmlSalaryReport(String departmentId, Date dateFrom, Date dateTo, String recipients) {
-        List<SalaryPayment> salaryPayments = salaryPaymentDao.salaryPaymentsGetByParam(departmentId, dateFrom, dateTo);
+    public void generateAndSendHtmlSalaryReport(String departmentId, DateRange range, String recipients) {
+        List<SalaryPayment> salaryPayments = salaryPaymentDao.salaryPaymentsGetByParam(departmentId, range);
         String report = reportBuilder.build(salaryPayments);
         sender.send(recipients, report);
     }

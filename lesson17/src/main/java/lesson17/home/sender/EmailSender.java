@@ -7,6 +7,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 public class EmailSender implements Sender {
+
+    public static final String SUBJECT = "Monthly department salary report";
+
     public void send(String recipients, String report) {
         // now when the report is built we need to send it to the recipients list
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -20,7 +23,7 @@ public class EmailSender implements Sender {
             helper.setTo(recipients);
             // setting message text, last parameter 'true' says that it is HTML format
             helper.setText(report, true);
-            helper.setSubject("Monthly department salary report");
+            helper.setSubject(SUBJECT);
             // send the message
             mailSender.send(message);
         } catch (MessagingException e) {
