@@ -23,14 +23,14 @@ public class Server {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private static final int PORT = 1234;
-    public static final int N_THREADS = 10;
+    private static final int N_THREADS = 10;
     private static int MIND_NUMBER = 55;
 
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(N_THREADS);
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             LOGGER.info("Server is waiting for connection");
-            while (true) {
+            while (!serverSocket.isClosed()) {
                 executorService.execute(new PersonalWork(serverSocket.accept()));
             }
         } catch (IOException e) {
@@ -61,7 +61,7 @@ public class Server {
                 try {
                     clientSocket.close();
                 } catch (IOException e) {
-                    throw new IllegalStateException(e);
+                    //ignore
                 }
             }
         }

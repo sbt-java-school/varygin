@@ -1,10 +1,8 @@
 package sbt.lesson18.com.utils;
 
-import sbt.lesson18.com.part2.dao.Message;
 import sbt.lesson18.com.part2.exceptions.BusinessException;
 
 import java.io.*;
-import java.util.List;
 
 public class SocketReader implements Receiver {
 
@@ -21,7 +19,7 @@ public class SocketReader implements Receiver {
         try {
             val = Integer.parseInt(reader.readLine());
         } catch (Exception e) {
-            val = -5;
+            //ignore
         }
         return val;
     }

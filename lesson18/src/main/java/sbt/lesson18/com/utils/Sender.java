@@ -6,6 +6,9 @@ import sbt.lesson18.com.part2.service.Command;
 import java.io.Closeable;
 import java.io.IOException;
 
+/**
+ * Интерфейс отправки сообщений между клиентом и сервером
+ */
 public interface Sender extends Closeable {
     void send(String message) throws IOException;
     void sendCommand(Command command) throws IOException;
