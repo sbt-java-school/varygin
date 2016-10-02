@@ -12,6 +12,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Сервер: отвечает за подключение новых клиентов (максимум MAX_COUNT_OF_THREADS)
+ * Каждый новый клиент обрабатывается в отдельном потоке
+ */
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 

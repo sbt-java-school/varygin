@@ -1,5 +1,8 @@
 package sbt.lesson18.com.part2.exceptions;
 
+/**
+ * Любые исключения, для проброски
+ */
 public class BusinessException extends RuntimeException {
     public BusinessException() {
     }

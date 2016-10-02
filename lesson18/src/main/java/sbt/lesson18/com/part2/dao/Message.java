@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Класс, реализующий передаваемые между пользователями сообщения
+ */
 public class Message implements Serializable {
     private final String text;
     private final Date dateAdd;

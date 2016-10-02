@@ -7,6 +7,10 @@ import sbt.lesson18.com.utils.*;
 import java.io.*;
 import java.net.Socket;
 
+
+/**
+ * Клиент: отвечает за интерфейс обработки действий клиента по общению с сервером
+ */
 public class Client {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);

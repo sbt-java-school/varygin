@@ -5,12 +5,17 @@ import sbt.lesson18.com.utils.Sender;
 import sbt.lesson18.com.utils.SocketReader;
 import sbt.lesson18.com.utils.SocketSender;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class IOStreams {
+
+/**
+ * Общее хранилище для потоков взаимодействия
+ */
+public class IOStreams implements Closeable {
     private final Socket socket;
     private final Sender sender;
     private final Receiver receiver;
@@ -35,5 +40,11 @@ public class IOStreams {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public void close() throws IOException {
+        sender.close();
+        receiver.close();
+        socket.close();
     }
 }

@@ -17,7 +17,13 @@ public class SocketReader implements Receiver {
     }
 
     public int readInt() throws IOException {
-        return Integer.parseInt(reader.readLine());
+        int val = 0;
+        try {
+            val = Integer.parseInt(reader.readLine());
+        } catch (Exception e) {
+            val = -5;
+        }
+        return val;
     }
 
     public boolean readBool() throws IOException {

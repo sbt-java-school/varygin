@@ -1,5 +1,8 @@
 package sbt.lesson18.com.part2.service;
 
+/**
+ * Перечисление доступных серверу и клиенту комманд
+ */
 public enum Command {
     /**
      * Авторизация

@@ -6,16 +6,17 @@ import sbt.lesson18.com.part2.dao.IOStreams;
 import sbt.lesson18.com.part2.dao.Message;
 import sbt.lesson18.com.part2.exceptions.BusinessException;
 import sbt.lesson18.com.part2.exceptions.ConnectionException;
-import sbt.lesson18.com.part2.service.Protocol;
 import sbt.lesson18.com.part2.service.Command;
-import sbt.lesson18.com.utils.Receiver;
-import sbt.lesson18.com.utils.Sender;
+import sbt.lesson18.com.part2.service.Protocol;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
 
+/**
+ * Клиентское приложение, поддерживающее взаимодействие с серверным по протоколю Protocol
+ */
 public class Client extends Protocol {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
@@ -45,11 +46,7 @@ public class Client extends Protocol {
     }
 
     public void start() {
-        try (
-                Socket socket = streams.getSocket();
-                Sender sender = streams.getSender();
-                Receiver receiver = streams.getReceiver()
-        ) {
+        try (IOStreams socket = streams) {
             showGuide();
             if (tryAuth()) {
                 communication();
@@ -66,9 +63,9 @@ public class Client extends Protocol {
     private void showGuide() throws IOException {
         localStreams.getSender().print(
                 "Для выхода: exit\n" +
-                "Для получения списка сообщений: get\n" +
-                "Для отправки сообщения пользователю: #логин получателя#::#сообщение#\n" +
-                "Авторизуйтесь для начала."
+                        "Для получения списка сообщений: get\n" +
+                        "Для отправки сообщения пользователю: #логин получателя#::#сообщение#\n" +
+                        "Авторизуйтесь для начала."
         );
     }
 

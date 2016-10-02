@@ -1,5 +1,8 @@
 package sbt.lesson18.com.part2.exceptions;
 
+/**
+ * Исключения, возникающие при проблемах соединения
+ */
 public class ConnectionException extends RuntimeException {
     public ConnectionException() {
     }

@@ -3,13 +3,13 @@ package sbt.lesson18.com.part2.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sbt.lesson18.com.part2.Server;
+import sbt.lesson18.com.part2.dao.IOStreams;
 import sbt.lesson18.com.part2.dao.Message;
 import sbt.lesson18.com.part2.dao.Person;
 import sbt.lesson18.com.part2.exceptions.BusinessException;
 import sbt.lesson18.com.part2.exceptions.ConnectionException;
-import sbt.lesson18.com.part2.service.Protocol;
 import sbt.lesson18.com.part2.service.Command;
-import sbt.lesson18.com.utils.Receiver;
+import sbt.lesson18.com.part2.service.Protocol;
 import sbt.lesson18.com.utils.Sender;
 
 import java.io.IOException;
@@ -18,11 +18,16 @@ import java.net.SocketException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Класс для обеспечения обработки каждого клиента в отдельном потоке
+ * Хранит в себе список всех клиентов в конкурентной мапе
+ * Для инициализации необходим сокет подключившегося клиента
+ * Протокол взаимодействия описан в классе родителе: Protocol
+ */
 public class ServerClient extends Protocol implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
     private static final Map<String, Person> clients = new ConcurrentHashMap<>();
-
     private final Person person;
 
     public ServerClient(Socket socket) {
@@ -34,15 +39,11 @@ public class ServerClient extends Protocol implements Runnable {
     }
 
     public void run() {
-        try (
-                Socket socket = person.getIoStreams().getSocket();
-                Sender sender = person.getIoStreams().getSender();
-                Receiver receiver = person.getIoStreams().getReceiver()
-        ) {
+        try (IOStreams socket = person.getIoStreams()) {
             if (tryAuth()) {
                 communication();
             }
-        } catch (ConnectionException | SocketException e ) {
+        } catch (ConnectionException | SocketException e) {
             LOGGER.info("Пользователь {} покинул чат", person.getLogin());
         } catch (IOException e) {
             throw new BusinessException(e);

@@ -11,15 +11,24 @@ import java.util.concurrent.Semaphore;
 
 /**
  * Person - каждый клиент чата
- * Каждая персона содержит историю сообщений текущей сессии
- * и свой логин
+ * Каждая персона содержит историю сообщений текущей сессии (максимум 10), свой логин и
+ * потоки взаимодействия для серверного приложения
  */
 public class Person {
+    // Максимальное количество сообщений в истории
     private static final int DEFAULT_BOUND = 10;
+
+    // Логин пользователя
     private String login;
+
+    // История сообщений, если сообщения в истории превысят лимит, то очередь начнёт отчищаться с самых старых сообщений
     private final Deque<Message> history;
-    private final Semaphore blockingCountMessages;
+
+    // Хранилище потоков для взаимодействия клиен-сервер
     private final IOStreams ioStreams;
+
+    // Блокировка для контроля количества сообщений в истории
+    private final Semaphore blockingCountMessages;
 
     public Person(Socket socket) throws IOException {
         this("anonymous", socket);

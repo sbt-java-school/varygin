@@ -10,6 +10,15 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Сервер: отвечает за подключение новых клиентов (максимум MAX_COUNT_OF_THREADS)
+ * Каждый новый клиент обрабатывается в отдельном потоке
+ * Поведение клиента и сервера подчиняется протоколу:
+ * 1. Сервер подключается - ждёт подключения нового клиента
+ * 2. Клиент подключается и отправляет число, введённое пользователем
+ * 3. Сервер отвечает либо ДА либо НЕТ в качестве переменной типа boolean
+ * 4. Операция повторяется, пока клиент не угадает число
+ */
 public class Server {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
