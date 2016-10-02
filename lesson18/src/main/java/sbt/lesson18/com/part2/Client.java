@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Клиентское приложение, поддерживающее взаимодействие с серверным по протоколю Protocol
@@ -46,9 +49,17 @@ public class Client extends Protocol {
     }
 
     public void start() {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         try (IOStreams socket = streams) {
             showGuide();
             if (tryAuth()) {
+                executorService.scheduleAtFixedRate(() -> {
+                    try {
+                        this.getAllMessages(false);
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }, 1, 5, TimeUnit.SECONDS);
                 communication();
             }
         } catch (SocketException e) {
@@ -57,6 +68,8 @@ public class Client extends Protocol {
             localStreams.getSender().print(e.getMessage());
         } catch (IOException e) {
             throw new BusinessException(e);
+        } finally {
+            executorService.shutdown();
         }
     }
 
@@ -101,11 +114,11 @@ public class Client extends Protocol {
         }
     }
 
-    protected void getAllMessages() throws IOException {
+    protected void getAllMessages(boolean showAnswer) throws IOException {
         streams.getSender().send(Command.GET_ALL.getCode());
 
         List<Message> messages = (List<Message>) streams.getReceiver().readMessage();
-        if (messages.isEmpty()) {
+        if (messages.isEmpty() && showAnswer) {
             localStreams.getSender().print(Command.NO_MESSAGES.getText());
         }
         messages.forEach(message -> localStreams.getSender().print(message.getText()));

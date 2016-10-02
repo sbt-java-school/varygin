@@ -49,7 +49,7 @@ public abstract class Protocol {
                 throw new ConnectionException("Соединение с сервером разорвано");
             }
             if (message.equals(Command.GET_ALL.getCode())) {
-                getAllMessages();
+                getAllMessages(true);
             } else if (message.equals(Command.EXIT.getCode())) {
                 if (closeConnection()) {
                     break;
@@ -82,9 +82,10 @@ public abstract class Protocol {
     /**
      * Запрос на все отправленные сообщения клиентом
      * Отправка всех сообщений клиента сервером
+     * @param showAnswer - флаг, показывать ли ответ от сервера в клиенте
      * @throws IOException
      */
-    protected abstract void getAllMessages() throws IOException;
+    protected abstract void getAllMessages(boolean showAnswer) throws IOException;
 
     /**
      * Запрос на завершение сессии клиентом

@@ -2,9 +2,12 @@ package sbt.lesson18.com.part1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sbt.lesson18.com.utils.*;
+import sbt.lesson18.com.utils.Receiver;
+import sbt.lesson18.com.utils.Sender;
+import sbt.lesson18.com.utils.SocketReader;
+import sbt.lesson18.com.utils.SocketSender;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;

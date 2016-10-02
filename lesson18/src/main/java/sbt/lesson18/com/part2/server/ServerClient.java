@@ -100,7 +100,7 @@ public class ServerClient extends Protocol implements Runnable {
         return person.getIoStreams().getReceiver().readString();
     }
 
-    protected void getAllMessages() throws IOException {
+    protected void getAllMessages(boolean showAnswer) throws IOException {
         person.getIoStreams().getSender().sendObject(person.getMessagesList());
     }
 
