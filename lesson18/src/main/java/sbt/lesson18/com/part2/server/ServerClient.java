@@ -76,10 +76,12 @@ public class ServerClient extends Protocol implements Runnable {
 
             Command resultCommand = Command.CONNECTION_SUCCESS;
             if (clients.containsKey(login)) {
-                if (!clients.get(login).getIoStreams().getSocket().isClosed()) {
+                Person oldPerson = clients.get(login);
+                if (!oldPerson.getIoStreams().getSocket().isClosed()) {
                     sender.sendCommand(Command.ALREADY_EXIST);
                     return false;
                 } else {
+                    person.setHistory(oldPerson.getHistory());
                     resultCommand = Command.RECONNECTION_SUCCESS;
                 }
             }
@@ -135,6 +137,8 @@ public class ServerClient extends Protocol implements Runnable {
 
     private void sendNotification() {
         Message message = new Message(Command.NOTIFICATION.getText() + ": " + person.getLogin(), "system", "");
-        clients.values().forEach(p -> p.addMessage(message));
+        clients.values().stream()
+                .filter(p -> !p.getLogin().equals(person.getLogin()))
+                .forEach(p -> p.addMessage(message));
     }
 }

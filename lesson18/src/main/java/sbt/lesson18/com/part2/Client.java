@@ -49,17 +49,19 @@ public class Client extends Protocol {
     }
 
     public void start() {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+//        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         try (IOStreams socket = streams) {
             showGuide();
             if (tryAuth()) {
-                executorService.scheduleAtFixedRate(() -> {
+                getAllMessages(false);
+                /*executorService.scheduleAtFixedRate(() -> {
                     try {
                         this.getAllMessages(false);
                     } catch (IOException e) {
                         //ignore
                     }
-                }, 1, 5, TimeUnit.SECONDS);
+                }, 1, 5, TimeUnit.SECONDS);*/
+
                 communication();
             }
         } catch (SocketException e) {
@@ -68,9 +70,9 @@ public class Client extends Protocol {
             localStreams.getSender().print(e.getMessage());
         } catch (IOException e) {
             throw new BusinessException(e);
-        } finally {
+        } /*finally {
             executorService.shutdown();
-        }
+        }*/
     }
 
     private void showGuide() throws IOException {
@@ -88,7 +90,7 @@ public class Client extends Protocol {
 
     protected void loginForm() {
         try {
-            Command command = Command.valueOf(streams.getReceiver().readString()); //ждём запрос сервера
+            Command command = streams.getReceiver().readCommand(); //ждём запрос сервера
             if (command != Command.AUTH) {
                 throw new BusinessException("Нарушен протокол!");
             }
@@ -106,7 +108,7 @@ public class Client extends Protocol {
 
     protected boolean login() {
         try {
-            Command command = Command.valueOf(streams.getReceiver().readString()); //ждём подтверждение сервера
+            Command command = streams.getReceiver().readCommand(); //ждём подтверждение сервера
             localStreams.getSender().print(command.getText());
             return command == Command.CONNECTION_SUCCESS || command == Command.RECONNECTION_SUCCESS;
         } catch (IOException e) {
@@ -126,8 +128,7 @@ public class Client extends Protocol {
 
     protected boolean closeConnection() throws IOException {
         streams.getSender().send(Command.EXIT.getCode());
-        String result = streams.getReceiver().readString();
-        if (Command.valueOf(result) == Command.SUCCESS) {
+        if (streams.getReceiver().readCommand() == Command.SUCCESS) {
             localStreams.getSender().print("Вы успешно вышли из чата");
         } else {
             localStreams.getSender().print("Сервер не отключился");
@@ -144,10 +145,10 @@ public class Client extends Protocol {
         }
         streams.getSender().send(Command.SEND.getCode()); //предупреждаеме сервер о новом сообщении
 
-        Command command = Command.valueOf(streams.getReceiver().readString()); //ждём соглашение
+        Command command = streams.getReceiver().readCommand(); //ждём соглашение
         if (command == Command.SUCCESS) {
             streams.getSender().sendObject(new Message(buff[1], login, buff[0]));
-            command = Command.valueOf(streams.getReceiver().readString()); //ждём подтверждение
+            command = streams.getReceiver().readCommand(); //ждём подтверждение
         }
         localStreams.getSender().print(command.getText());
     }

@@ -22,7 +22,7 @@ public class Person {
     private String login;
 
     // История сообщений, если сообщения в истории превысят лимит, то очередь начнёт отчищаться с самых старых сообщений
-    private final Deque<Message> history;
+    private Deque<Message> history;
 
     // Хранилище потоков для взаимодействия клиен-сервер
     private final IOStreams ioStreams;
@@ -54,6 +54,14 @@ public class Person {
             history.remove();
         }
         history.add(message);
+    }
+
+    public void setHistory(Deque<Message> history) {
+        this.history = history;
+    }
+
+    public Deque<Message> getHistory() {
+        return history;
     }
 
     public List<Message> getMessagesList() {
