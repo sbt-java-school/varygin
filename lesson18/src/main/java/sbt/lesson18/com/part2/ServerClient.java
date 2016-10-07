@@ -1,22 +1,17 @@
-package sbt.lesson18.com.part2.server;
+package sbt.lesson18.com.part2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sbt.lesson18.com.part2.Server;
-import sbt.lesson18.com.part2.dao.IOStreams;
-import sbt.lesson18.com.part2.dao.Message;
-import sbt.lesson18.com.part2.dao.Person;
-import sbt.lesson18.com.part2.exceptions.BusinessException;
-import sbt.lesson18.com.part2.exceptions.ConnectionException;
-import sbt.lesson18.com.part2.service.Command;
-import sbt.lesson18.com.part2.service.Protocol;
+import sbt.lesson18.com.part2.dao.*;
+import sbt.lesson18.com.part2.exceptions.*;
+import sbt.lesson18.com.part2.service.*;
 import sbt.lesson18.com.utils.Sender;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Класс для обеспечения обработки каждого клиента в отдельном потоке
@@ -24,13 +19,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * Для инициализации необходим сокет подключившегося клиента
  * Протокол взаимодействия описан в классе родителе: Protocol
  */
-public class ServerClient extends Protocol implements Runnable {
+class ServerClient extends Protocol implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
     private static final Map<String, Person> clients = new ConcurrentHashMap<>();
+
     private final Person person;
 
-    public ServerClient(Socket socket) {
+    ServerClient(Socket socket) {
         try {
             this.person = new Person(socket);
         } catch (IOException e) {
@@ -85,7 +81,7 @@ public class ServerClient extends Protocol implements Runnable {
                     resultCommand = Command.RECONNECTION_SUCCESS;
                 }
             }
-            sendNotification();
+            sendNotification(Command.NOTIFICATION.getText());
             clients.put(login, person);
 
             sender.sendCommand(resultCommand);
@@ -108,6 +104,7 @@ public class ServerClient extends Protocol implements Runnable {
 
     protected boolean closeConnection() throws IOException {
         LOGGER.info("Пользователь {} покинул чат", person.getLogin());
+        sendNotification(Command.USER_OUT.getText());
         person.getIoStreams().getSender().sendCommand(Command.SUCCESS);
         return true;
     }
@@ -135,10 +132,41 @@ public class ServerClient extends Protocol implements Runnable {
         }
     }
 
-    private void sendNotification() {
-        Message message = new Message(Command.NOTIFICATION.getText() + ": " + person.getLogin(), "system", "");
-        clients.values().stream()
-                .filter(p -> !p.getLogin().equals(person.getLogin()))
-                .forEach(p -> p.addMessage(message));
+    private void sendNotification(String text) {
+        Message message = new Message(person.getLogin() + " " + text, "system", "");
+        BCast.setNewClient(message.getText());
+    }
+
+    static class BCast implements Runnable {
+        private static final int MULTICAST_PORT = 4555;
+        private static final String MULTICAST_GROUP = "239.255.255.0";
+        private static final SynchronousQueue<String> newClients = new SynchronousQueue<>();
+
+        public void run() {
+            try {
+                InetAddress group = InetAddress.getByName(MULTICAST_GROUP);
+                try (DatagramSocket socket = new DatagramSocket()) {
+                    Thread currentThread = Thread.currentThread();
+                    LOGGER.info("Широковещательный сокет подключился");
+                    while (!currentThread.isInterrupted()) {
+                        String buff = newClients.take();
+                        DatagramPacket packege = new DatagramPacket(buff.getBytes(), buff.getBytes().length, group, MULTICAST_PORT);
+                        socket.send(packege);
+                    }
+                } catch (InterruptedException e) {
+                    LOGGER.debug("BCast interrupted");
+                }
+            } catch (IOException e) {
+                System.out.println("BCastExit");
+            }
+        }
+
+        static void setNewClient(String text) {
+            try {
+                newClients.put(text);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
     }
 }

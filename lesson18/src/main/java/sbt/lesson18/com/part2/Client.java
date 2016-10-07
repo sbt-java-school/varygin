@@ -4,18 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sbt.lesson18.com.part2.dao.IOStreams;
 import sbt.lesson18.com.part2.dao.Message;
-import sbt.lesson18.com.part2.exceptions.BusinessException;
-import sbt.lesson18.com.part2.exceptions.ConnectionException;
-import sbt.lesson18.com.part2.service.Command;
-import sbt.lesson18.com.part2.service.Protocol;
+import sbt.lesson18.com.part2.exceptions.*;
+import sbt.lesson18.com.part2.service.*;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Клиентское приложение, поддерживающее взаимодействие с серверным по протоколю Protocol
@@ -26,6 +20,7 @@ public class Client extends Protocol {
     private String login;
     private final IOStreams streams;
     private final IOStreams localStreams;
+    private final Thread bcast;
 
     private static final int PORT = 1234;
     private static final String HOST = "localhost";
@@ -35,6 +30,7 @@ public class Client extends Protocol {
             Socket socket = new Socket(HOST, PORT);
             streams = new IOStreams(socket);
             localStreams = new IOStreams(null, System.in, System.out);
+            bcast = new Thread(new BCast());
         } catch (IOException e) {
             throw new ConnectionException("Не удалось подключиться к серверу " + e.getMessage(), e);
         }
@@ -49,19 +45,12 @@ public class Client extends Protocol {
     }
 
     public void start() {
-//        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         try (IOStreams socket = streams) {
             showGuide();
+            bcast.setDaemon(true);
+            bcast.start();
             if (tryAuth()) {
                 getAllMessages(false);
-                /*executorService.scheduleAtFixedRate(() -> {
-                    try {
-                        this.getAllMessages(false);
-                    } catch (IOException e) {
-                        //ignore
-                    }
-                }, 1, 5, TimeUnit.SECONDS);*/
-
                 communication();
             }
         } catch (SocketException e) {
@@ -70,9 +59,9 @@ public class Client extends Protocol {
             localStreams.getSender().print(e.getMessage());
         } catch (IOException e) {
             throw new BusinessException(e);
-        } /*finally {
-            executorService.shutdown();
-        }*/
+        } finally {
+            bcast.interrupt();
+        }
     }
 
     private void showGuide() throws IOException {
@@ -155,5 +144,32 @@ public class Client extends Protocol {
 
     protected String getNextMessage() throws IOException {
         return localStreams.getReceiver().readString();
+    }
+
+    private class BCast implements Runnable {
+        private static final int MULTICAST_PORT = 4555;
+        private static final String MULTICAST_GROUP = "239.255.255.0";
+        private static final int BUFFER_SIZE = 100;
+
+        public void run() {
+            try (MulticastSocket socket = new MulticastSocket(MULTICAST_PORT)) {
+
+                InetAddress multicastAddress = InetAddress.getByName(MULTICAST_GROUP);
+                socket.joinGroup(multicastAddress);
+
+                byte[] buffer = new byte[BUFFER_SIZE];
+                String message = "";
+                Thread currentThread = Thread.currentThread();
+                while (!currentThread.isInterrupted()) {
+                    DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
+                    socket.receive(datagramPacket);
+                    message = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                    localStreams.getSender().print(message);
+                }
+                socket.leaveGroup(multicastAddress);
+            } catch (IOException e) {
+                LOGGER.debug("Ошибка в широковещательном протокола");
+            }
+        }
     }
 }

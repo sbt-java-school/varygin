@@ -36,7 +36,7 @@ public class SocketReader implements Receiver {
     public Object readMessage() throws IOException {
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         try {
-             return objectInputStream.readObject();
+            return objectInputStream.readObject();
         } catch (ClassNotFoundException e) {
             throw new BusinessException(e);
         }

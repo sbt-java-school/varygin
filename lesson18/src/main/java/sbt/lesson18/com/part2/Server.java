@@ -2,9 +2,7 @@ package sbt.lesson18.com.part2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sbt.lesson18.com.part2.exceptions.BusinessException;
-import sbt.lesson18.com.part2.exceptions.ConnectionException;
-import sbt.lesson18.com.part2.server.ServerClient;
+import sbt.lesson18.com.part2.exceptions.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,6 +19,7 @@ public class Server {
 
     private static final int PORT = 1234;
     private static final int MAX_COUNT_OF_THREADS = 5;
+    private final Thread bcast;
 
     private final ExecutorService clientsThreadPool;
 
@@ -28,11 +27,14 @@ public class Server {
         if (nThreads > MAX_COUNT_OF_THREADS) {
             nThreads = MAX_COUNT_OF_THREADS;
         }
+        this.bcast = new Thread(new ServerClient.BCast());
         this.clientsThreadPool = Executors.newFixedThreadPool(nThreads);
     }
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            bcast.setDaemon(true);
+            bcast.start();
             LOGGER.info("Сервер ожидает подключения");
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -43,6 +45,8 @@ public class Server {
             throw new BusinessException("Не удалось подключить нового пользователя к чату: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new BusinessException("Ошибка сервера: " + e.getMessage(), e);
+        } finally {
+            bcast.interrupt();
         }
     }
 

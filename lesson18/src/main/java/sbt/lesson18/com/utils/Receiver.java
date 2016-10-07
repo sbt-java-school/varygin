@@ -10,9 +10,14 @@ import java.io.IOException;
  */
 public interface Receiver extends Closeable {
     int readInt() throws IOException;
+
     boolean readBool() throws IOException;
+
     String readString() throws IOException;
+
     Object readMessage() throws IOException;
+
     Command readCommand() throws IOException;
+
     void close() throws IOException;
 }
