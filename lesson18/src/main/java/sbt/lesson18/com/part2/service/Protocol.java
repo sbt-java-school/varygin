@@ -1,72 +1,48 @@
 package sbt.lesson18.com.part2.service;
 
-import sbt.lesson18.com.part2.exceptions.ConnectionException;
-
-import java.io.IOException;
+import sbt.lesson18.com.part2.dao.Message;
+import sbt.lesson18.com.part2.exceptions.BusinessException;
 
 /**
  * Протокол взаимодействия клиента и сервера
  */
 public abstract class Protocol {
-    /**
-     * Метод для авторизации клиента на сервере.
-     * При подключении нового клиента, сервер отправляет запрос на авторизацию по логину (loginForm)
-     * Клиентское приложение считывает от пользователя логин и отправляет серверу (login)
-     * Сервер пытается авторизовать пользователя:
-     * Если пользователь ранее был авторизован, но выходил - он просто переподключается
-     * Если пользователь новый и ещё есть свободные потоки - подключается новый пользователь
-     * Иначе - в авторизации отказывается
-     * Клиент ждёт от сервера ответа и если он положительный - начинает комуникацию, а если нет, повторяет запрос логина
-     *
-     * @return true - в случае успешной авторизации, false - иначе
-     * @throws IOException - пробрасываются все ошибки ввода
-     */
-    protected final boolean tryAuth() throws IOException {
-        while (true) {
-            if (isClosedConnection()) {
-                return false;
-            }
-            loginForm();
-            if (login()) {
-                break;
-            }
-        }
-        return true;
-    }
 
     /**
-     * Комуникация между авторизованным пользователем и серверром
-     * Комуникацию инициирует пользователь вводя команду в консоль
-     * Если соединение не потеряно, то команда отправляется серверу и ожадается ответ в соответствии с протоколом
-     * Сервер, в свою очередь отвечает по протоколу взаимодействия, соответствующим запрошеной комманде образом
-     * Условие завершение взаимодействия - либо экстренное прерывание, либо ввод команды exit пользователем
-     *
-     * @throws IOException
+     * Комуникация между пользователем и серверром осуществляется при помощи
+     * команд отправляемых клиентом/сервером. Все команды представленны в виде сообщений
+     * Message. Каждое сообщение должно содержать команду типа Command для корректной обработки
+     * запроса. Каждый элемент перечисления Command содержит метод action и в зависимости от
+     * запрошеной команды выполняется соответствующее действие протокола.
      */
-    protected final void communication() throws IOException {
-        while (true) {
-            String message = getNextMessage();
-            if (isClosedConnection()) {
-                throw new ConnectionException("Соединение с сервером разорвано");
+    protected final void communication() {
+        try {
+            before();
+            while (true) {
+                nextAction(getNextMessage());
             }
-            if (message.equals(Command.GET_ALL.getCode())) {
-                getAllMessages(true);
-            } else if (message.equals(Command.EXIT.getCode())) {
-                if (closeConnection()) {
-                    break;
-                }
-            } else {
-                sendMessage(message);
-            }
+        } finally {
+            after();
         }
     }
 
     /**
-     * Проверка на наличие соединения
+     * Запуск действия в зависимости от команды сервера/клиента
      *
-     * @return true - если соединение не потеряно, false - иначе
+     * @param message обрабатываемое сообщение
      */
-    protected abstract boolean isClosedConnection();
+    protected final void nextAction(Message message) {
+        message.getCommand().action(this, message);
+    }
+
+    /**
+     * Сервисные действия для подготовки комуникации между клиентом и сервером
+     */
+    protected void before() {
+    }
+
+    protected void after() {
+    }
 
     /**
      * Запрос сервером авторизации
@@ -77,43 +53,52 @@ public abstract class Protocol {
     /**
      * Попытка авторизовать клиента сервером
      * Ожидание вердикта клиентом
-     *
-     * @return true - если авторизация удалась, false - иначе
      */
-    protected abstract boolean login();
+    protected abstract void login(Message message);
+
+    /**
+     * Обработка ответа сервера в случае дублирования логина
+     */
+    protected void userExist() {
+        throw new BusinessException(Command.ALREADY_EXIST.getText());
+    }
+
+    /**
+     * Распечатка результата авторизации на стороне клиента
+     *
+     * @param text текст сообщения от сервера
+     */
+    protected void showNotification(String text) {
+        throw new BusinessException(text);
+    }
+
+    protected void getUsers() {
+        throw new BusinessException("Операция не поддерживается");
+    }
 
     /**
      * Запрос на все отправленные сообщения клиентом
-     * Отправка всех сообщений клиента сервером
-     *
-     * @param showAnswer - флаг, показывать ли ответ от сервера в клиенте
-     * @throws IOException
+     * Отправка всех сообщений сервером клиенту
      */
-    protected abstract void getAllMessages(boolean showAnswer) throws IOException;
+    protected abstract void getAllMessages();
 
     /**
      * Запрос на завершение сессии клиентом
      * Корректное завершение сервером всех потоков, связанных с клиентом
-     *
-     * @return true - в случае успешного завершения, false - иначе
-     * @throws IOException
      */
-    protected abstract boolean closeConnection() throws IOException;
+    protected abstract void closeConnection();
 
     /**
      * Отправка введённого пользователем сообщения от клиентского приложения
-     * Получение отправленного пользователем сообщения на стороне сервера и перенаправление этого сообщения соответствующему клиенту
+     * Получение отправленного пользователем сообщения на стороне сервера и
+     * перенаправление этого сообщения соответствующему клиенту
      *
-     * @param text текст сообщения у клиента и команда "приготовиться к получению сообщения" у сервера
-     * @throws IOException
+     * @param message передаваемое сообщение
      */
-    protected abstract void sendMessage(String text) throws IOException;
+    protected abstract void sendMessage(Message message);
 
     /**
-     * Получение отправленной команды из интерфейса клиента и сервера
-     *
-     * @return
-     * @throws IOException
+     * Ожидание получения сообщения
      */
-    protected abstract String getNextMessage() throws IOException;
+    protected abstract Message getNextMessage();
 }

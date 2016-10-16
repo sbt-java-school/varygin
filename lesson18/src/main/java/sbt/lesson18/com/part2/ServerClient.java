@@ -2,16 +2,21 @@ package sbt.lesson18.com.part2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sbt.lesson18.com.part2.dao.*;
-import sbt.lesson18.com.part2.exceptions.*;
-import sbt.lesson18.com.part2.service.*;
+import sbt.lesson18.com.part2.dao.IOStreams;
+import sbt.lesson18.com.part2.dao.Message;
+import sbt.lesson18.com.part2.dao.Person;
+import sbt.lesson18.com.part2.exceptions.ConnectionException;
+import sbt.lesson18.com.part2.service.Command;
+import sbt.lesson18.com.part2.service.Protocol;
 import sbt.lesson18.com.utils.Sender;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
+import java.util.stream.Collectors;
 
 /**
  * Класс для обеспечения обработки каждого клиента в отдельном потоке
@@ -36,105 +41,120 @@ class ServerClient extends Protocol implements Runnable {
 
     public void run() {
         try (IOStreams socket = person.getIoStreams()) {
-            if (tryAuth()) {
-                communication();
-            }
+            communication();
         } catch (ConnectionException | SocketException e) {
             LOGGER.info("Пользователь {} покинул чат", person.getLogin());
         } catch (IOException e) {
-            throw new BusinessException(e);
-        } catch (BusinessException e) {
-            LOGGER.debug(e.getMessage());
+            LOGGER.info(e.getMessage());
         }
     }
 
-    protected boolean isClosedConnection() {
-        return person.getIoStreams().getSocket().isClosed();
+    @Override
+    protected void before() {
+        loginForm();
     }
 
+    @Override
+    protected void after() {
+
+    }
+
+    @Override
     protected void loginForm() {
         try {
-            person.getIoStreams().getSender().sendCommand(Command.AUTH);
+            person.getIoStreams().getSender().sendObject(new Message(Command.AUTH));
         } catch (IOException e) {
             throw new ConnectionException(e);
         }
     }
 
-    protected boolean login() {
-        Sender sender = person.getIoStreams().getSender();
+    @Override
+    protected void login(Message message) {
         try {
-            String login = person.getIoStreams().getReceiver().readString();
-            if (login == null) {
-                sender.sendCommand(Command.ERROR);
-                return false;
-            }
-            person.setLogin(login);
+            Sender sender = person.getIoStreams().getSender();
 
-            Command resultCommand = Command.CONNECTION_SUCCESS;
+            String login = message.getText();
+            if (login == null) {
+                loginForm();
+                return;
+            }
+
+            person.setLogin(login);
+            String resultMessage = Command.CONNECTION_SUCCESS.getText();
+
             if (clients.containsKey(login)) {
                 Person oldPerson = clients.get(login);
                 if (!oldPerson.getIoStreams().getSocket().isClosed()) {
-                    sender.sendCommand(Command.ALREADY_EXIST);
-                    return false;
+                    sender.sendObject(new Message(Command.ALREADY_EXIST));
+                    return;
                 } else {
                     person.setHistory(oldPerson.getHistory());
-                    resultCommand = Command.RECONNECTION_SUCCESS;
+                    resultMessage = Command.RECONNECTION_SUCCESS.getText();
                 }
             }
-            sendNotification(Command.NOTIFICATION.getText());
+            sendNotification();
             clients.put(login, person);
 
-            sender.sendCommand(resultCommand);
+            sender.sendObject(new Message(Command.LOGIN, resultMessage));
         } catch (IOException e) {
-            if (isClosedConnection()) {
-                return false;
-            }
+            throw new ConnectionException(e);
         }
         LOGGER.info("Пользователь {} вошёл в чат", person.getLogin());
-        return true;
     }
 
-    protected String getNextMessage() throws IOException {
-        return person.getIoStreams().getReceiver().readString();
+    @Override
+    protected Message getNextMessage() {
+        try {
+            return (Message) person.getIoStreams().getReceiver().readMessage();
+        } catch (IOException e) {
+            throw new ConnectionException(e);
+        }
     }
 
-    protected void getAllMessages(boolean showAnswer) throws IOException {
-        person.getIoStreams().getSender().sendObject(person.getMessagesList());
+    @Override
+    protected void getAllMessages() {
+        try {
+            person.getIoStreams().getSender().sendObject(person.getMessagesList());
+        } catch (IOException e) {
+            throw new ConnectionException(e);
+        }
     }
 
-    protected boolean closeConnection() throws IOException {
-        LOGGER.info("Пользователь {} покинул чат", person.getLogin());
-        sendNotification(Command.USER_OUT.getText());
-        person.getIoStreams().getSender().sendCommand(Command.SUCCESS);
-        return true;
+    @Override
+    protected void closeConnection() {
+        throw new ConnectionException("Выход");
     }
 
-    protected void sendMessage(String text) throws IOException {
-        Sender sender = person.getIoStreams().getSender();
-        boolean success = false;
-        Command error = Command.ERROR;
-
-        if (text.equals(Command.SEND.getCode())) {
-            sender.sendCommand(Command.SUCCESS);
-
+    @Override
+    protected void sendMessage(Message message) {
+        try {
+            Sender sender = person.getIoStreams().getSender();
             Person personTo;
-            Message message = (Message) person.getIoStreams().getReceiver().readMessage();
             if (message != null && (personTo = clients.get(message.getTo())) != null) {
                 personTo.addMessage(message);
-                success = true;
+                sender.sendObject(new Message(Command.SUCCESS));
+                return;
             }
-            error = Command.ERROR_USER_NOT_EXIST;
-        }
-        if (!success) {
-            sender.sendCommand(error);
-        } else {
-            sender.sendCommand(Command.SUCCESS);
+            sender.sendObject(new Message(Command.ERROR_USER_NOT_EXIST));
+        } catch (IOException e) {
+            throw new ConnectionException(e);
         }
     }
 
-    private void sendNotification(String text) {
-        Message message = new Message(person.getLogin() + " " + text, "system", "");
-        BCast.setNewClient(message.getText());
+    @Override
+    protected void getUsers() {
+        try {
+            List<String> users = clients.keySet().stream()
+                    .filter(user -> !user.equals(person.getLogin()))
+                    .collect(Collectors.toList());
+            person.getIoStreams().getSender().sendObject(users);
+        } catch (IOException e) {
+            throw new ConnectionException(e);
+        }
+    }
+
+    private void sendNotification() {
+        BCast.setNewClient(person.getLogin());
     }
 
     static class BCast implements Runnable {

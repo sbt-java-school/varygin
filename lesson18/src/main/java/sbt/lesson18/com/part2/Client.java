@@ -4,146 +4,199 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sbt.lesson18.com.part2.dao.IOStreams;
 import sbt.lesson18.com.part2.dao.Message;
-import sbt.lesson18.com.part2.exceptions.*;
-import sbt.lesson18.com.part2.service.*;
+import sbt.lesson18.com.part2.exceptions.BusinessException;
+import sbt.lesson18.com.part2.exceptions.ConnectionException;
+import sbt.lesson18.com.part2.service.Command;
+import sbt.lesson18.com.part2.service.Protocol;
+import window.view.Controller;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.List;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Клиентское приложение, поддерживающее взаимодействие с серверным по протоколю Protocol
  */
-public class Client extends Protocol {
+public class Client extends Protocol implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
+    private final Controller controller;
+    private static final SynchronousQueue<Message> messages = new SynchronousQueue<>();
+
     private String login;
+    private boolean isAuth;
     private final IOStreams streams;
-    private final IOStreams localStreams;
     private final Thread bcast;
 
     private static final int PORT = 1234;
     private static final String HOST = "localhost";
 
-    public Client() {
+    public Client(Controller controller) {
+        this.controller = controller;
         try {
             Socket socket = new Socket(HOST, PORT);
             streams = new IOStreams(socket);
-            localStreams = new IOStreams(null, System.in, System.out);
             bcast = new Thread(new BCast());
         } catch (IOException e) {
-            throw new ConnectionException("Не удалось подключиться к серверу " + e.getMessage(), e);
+            controller.print("Сервер не отвечает");
+            throw new ConnectionException(e);
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            new Client().start();
-        } catch (ConnectionException | BusinessException e) {
-            LOGGER.debug(e.getMessage());
-        }
-    }
-
-    public void start() {
+    public void run() {
+        controller.enableBtn();
         try (IOStreams socket = streams) {
-            showGuide();
-            bcast.setDaemon(true);
-            bcast.start();
-            if (tryAuth()) {
-                getAllMessages(false);
-                communication();
-            }
-        } catch (SocketException e) {
-            localStreams.getSender().print("Сервер разорвал соединение");
-        } catch (ConnectionException e) {
-            localStreams.getSender().print(e.getMessage());
+            communication();
+        } catch (SocketException | ConnectionException e) {
+            controller.print("Вы вышли из чата");
         } catch (IOException e) {
             throw new BusinessException(e);
-        } finally {
-            bcast.interrupt();
         }
     }
 
-    private void showGuide() throws IOException {
-        localStreams.getSender().print(
-                "Для выхода: exit\n" +
-                        "Для получения списка сообщений: get\n" +
-                        "Для отправки сообщения пользователю: #логин получателя#::#сообщение#\n" +
-                        "Авторизуйтесь для начала."
-        );
+    public void addMessage(Message message) {
+        try {
+            if (message != null) {
+                messages.put(message);
+            }
+        } catch (InterruptedException e) {
+            LOGGER.info(e.getMessage());
+        }
     }
 
-    protected boolean isClosedConnection() {
-        return streams.getSocket().isClosed();
+    public Message prepareMessage(String text) {
+        if (isAuth) {
+            String recipient = controller.getRecipient();
+            if (recipient == null || recipient.isEmpty()) {
+                controller.print(Command.ERROR.getText());
+                return null;
+            }
+            return new Message(Command.SEND, text, login, recipient);
+        } else {
+            return new Message(Command.LOGIN, text);
+        }
     }
 
+    @Override
+    protected void before() {
+        bcast.setDaemon(true);
+        bcast.start();
+
+        controller.print("Для отправки сообщения пользователю веберите адресата из списка\n" +
+                "Авторизуйтесь для начала.\n");
+        nextAction(getSocketMessage());
+    }
+
+    @Override
+    protected void after() {
+        bcast.interrupt();
+    }
+
+    @Override
     protected void loginForm() {
         try {
-            Command command = streams.getReceiver().readCommand(); //ждём запрос сервера
-            if (command != Command.AUTH) {
-                throw new BusinessException("Нарушен протокол!");
-            }
-            localStreams.getSender().print(command.getText());
-
-            login = getNextMessage();
-            if (login.equals(Command.EXIT.getCode())) {
+            controller.print(Command.AUTH.getText());
+            Message login = getNextMessage();
+            this.login = login.getText();
+            streams.getSender().sendObject(login);
+            if (login.getCommand() == Command.EXIT) {
                 streams.getSocket().close();
+                throw new ConnectionException("Выход");
             }
-            streams.getSender().send(login);
+            nextAction(getSocketMessage());
         } catch (IOException e) {
             throw new ConnectionException(e);
         }
     }
 
-    protected boolean login() {
+    @Override
+    protected void userExist() {
+        controller.print(Command.ALREADY_EXIST.getText());
+        loginForm();
+    }
+
+    @Override
+    protected void showNotification(String text) {
+        if (text != null) {
+            controller.print(text);
+        }
+    }
+
+    @Override
+    protected void login(Message message) {
+        controller.print(message.getText());
+        isAuth = true;
+        controller.setLabel("Сообщение:");
+        controller.activateGet();
+        getAvailableUsers();
+        getAllMessages();
+    }
+
+    @Override
+    protected void getAllMessages() {
         try {
-            Command command = streams.getReceiver().readCommand(); //ждём подтверждение сервера
-            localStreams.getSender().print(command.getText());
-            return command == Command.CONNECTION_SUCCESS || command == Command.RECONNECTION_SUCCESS;
+            streams.getSender().sendObject(new Message(Command.GET_ALL));
+
+            List<Message> messages = (List<Message>) streams.getReceiver().readMessage();
+            if (messages.isEmpty()) {
+                controller.print(Command.NO_MESSAGES.getText());
+            } else {
+                messages.forEach(message -> controller.print(message.getMessage()));
+            }
         } catch (IOException e) {
             throw new ConnectionException(e);
         }
     }
 
-    protected void getAllMessages(boolean showAnswer) throws IOException {
-        streams.getSender().send(Command.GET_ALL.getCode());
-
-        List<Message> messages = (List<Message>) streams.getReceiver().readMessage();
-        if (messages.isEmpty() && showAnswer) {
-            localStreams.getSender().print(Command.NO_MESSAGES.getText());
+    @Override
+    protected void closeConnection() {
+        try {
+            streams.getSender().sendObject(new Message(Command.EXIT));
+            throw new ConnectionException("Выход");
+        } catch (IOException e) {
+            throw new ConnectionException(e);
         }
-        messages.forEach(message -> localStreams.getSender().print(message.getText()));
     }
 
-    protected boolean closeConnection() throws IOException {
-        streams.getSender().send(Command.EXIT.getCode());
-        if (streams.getReceiver().readCommand() == Command.SUCCESS) {
-            localStreams.getSender().print("Вы успешно вышли из чата");
-        } else {
-            localStreams.getSender().print("Сервер не отключился");
-            return false;
+    @Override
+    protected void sendMessage(Message message) {
+        try {
+            streams.getSender().sendObject(message);
+            nextAction(getSocketMessage());
+        } catch (IOException e) {
+            throw new ConnectionException(e);
         }
-        return true;
     }
 
-    protected void sendMessage(String text) throws IOException {
-        String[] buff;
-        if (!text.contains("::") || (buff = text.split("::")).length != 2 || login.equals(buff[0])) {
-            localStreams.getSender().print(Command.ERROR.getText());
-            return;
+    @Override
+    protected Message getNextMessage() {
+        try {
+            return messages.take();
+        } catch (InterruptedException e) {
+            throw new ConnectionException(e);
         }
-        streams.getSender().send(Command.SEND.getCode()); //предупреждаеме сервер о новом сообщении
-
-        Command command = streams.getReceiver().readCommand(); //ждём соглашение
-        if (command == Command.SUCCESS) {
-            streams.getSender().sendObject(new Message(buff[1], login, buff[0]));
-            command = streams.getReceiver().readCommand(); //ждём подтверждение
-        }
-        localStreams.getSender().print(command.getText());
     }
 
-    protected String getNextMessage() throws IOException {
-        return localStreams.getReceiver().readString();
+    private Message getSocketMessage() {
+        try {
+            return (Message) streams.getReceiver().readMessage();
+        } catch (IOException e) {
+            throw new ConnectionException(e);
+        }
+    }
+
+    private void getAvailableUsers() {
+        try {
+            streams.getSender().sendObject(new Message(Command.GET_USERS));
+
+            List<String> users = (List<String>) streams.getReceiver().readMessage();
+            if (users != null && !users.isEmpty()) {
+                users.forEach(controller::addUserToList);
+            }
+        } catch (IOException e) {
+            throw new ConnectionException(e);
+        }
     }
 
     private class BCast implements Runnable {
@@ -158,17 +211,19 @@ public class Client extends Protocol {
                 socket.joinGroup(multicastAddress);
 
                 byte[] buffer = new byte[BUFFER_SIZE];
-                String message = "";
                 Thread currentThread = Thread.currentThread();
                 while (!currentThread.isInterrupted()) {
                     DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
                     socket.receive(datagramPacket);
-                    message = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
-                    localStreams.getSender().print(message);
+                    String userLogin = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                    if (!userLogin.equals(login)) {
+                        controller.addUserToList(userLogin);
+                        controller.print("Подключился новый пользователь: " + userLogin);
+                    }
                 }
                 socket.leaveGroup(multicastAddress);
             } catch (IOException e) {
-                LOGGER.debug("Ошибка в широковещательном протокола");
+                controller.print("Ошибка в широковещательном протокола");
             }
         }
     }

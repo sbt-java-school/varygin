@@ -1,6 +1,9 @@
 package sbt.lesson18.com.part2.dao;
 
-import sbt.lesson18.com.utils.*;
+import sbt.lesson18.com.utils.Receiver;
+import sbt.lesson18.com.utils.Sender;
+import sbt.lesson18.com.utils.SocketReader;
+import sbt.lesson18.com.utils.SocketSender;
 
 import java.io.Closeable;
 import java.io.IOException;
