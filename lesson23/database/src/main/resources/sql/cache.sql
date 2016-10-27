@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS `cache` (
+  id        INTEGER(10) AUTO_INCREMENT NOT NULL,
+  `key`     VARCHAR(50)                NOT NULL,
+  value     BLOB,
+  update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  CONSTRAINT uq_key UNIQUE (`key`)
+);
