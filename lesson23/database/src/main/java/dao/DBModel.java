@@ -102,7 +102,7 @@ public abstract class DBModel {
         this.id = id;
     }
 
-    protected Long getId() {
+    public Long getId() {
         return id;
     }
 }

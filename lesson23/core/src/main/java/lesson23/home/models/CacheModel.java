@@ -2,8 +2,7 @@ package lesson23.home.models;
 
 import dao.DBModel;
 import dao.TableField;
-import exception.BusinessException;
-import lesson23.home.proxy.Value;
+import lesson23.home.caches.Value;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,20 +14,18 @@ import java.sql.Timestamp;
 
 /**
  * Модель для взаимодействия с конкретной таблицей БД.
- *
+ * <p>
  * Содержит три поля идентичных трём столбцам таблицы БД.
  * Каждое такое поле должно быть отмечено аннотацией @TableField
  * и иметь публичный getter и setter.
- *
+ * <p>
  * Даннач модель сохраняет в качестве значения - обект.
- *
- * @param <T> - тип кешируемого значения
  */
-public class CacheModel<T> extends DBModel {
+public class CacheModel extends DBModel {
     @TableField
     private String key;
     @TableField
-    private Value<T> value;
+    private Value value;
     @TableField
     private Timestamp update_at;
 
@@ -36,26 +33,34 @@ public class CacheModel<T> extends DBModel {
         this(key, null);
     }
 
-    public CacheModel(String key, Value<T> value) {
+    public CacheModel(String key, Value value) {
         this(null, key, value);
     }
 
-    public CacheModel(Long id, String key, Value<T> value) {
+    public CacheModel(Long id, String key, Value value) {
         super(id, "cache");
         this.key = key;
         this.value = value;
     }
 
-    public Value<T> getValue() {
+    public Value getValue() {
         return value;
     }
 
-    public void setValue(Value<T> value) {
+    public void setValue(Value value) {
         this.value = value;
     }
 
     public String getKey() {
         return key;
+    }
+
+    public Timestamp getUpdate_at() {
+        return update_at;
+    }
+
+    public void setUpdate_at(Timestamp update_at) {
+        this.update_at = update_at;
     }
 
     public boolean getCacheByKey() {
@@ -79,22 +84,8 @@ public class CacheModel<T> extends DBModel {
             if (value != null) {
                 return true;
             }
-            if (object != null && object.getClass().isAssignableFrom(Value.class)) {
-                @SuppressWarnings("unchecked")
-                Value<T> value = (Value<T>) object;
-                setValue(value);
-                return true;
-            } else {
-                throw new BusinessException("Wrong value in DB");
-            }
+            setValue((Value) object);
+            return true;
         }
-    }
-
-    public Timestamp getUpdate_at() {
-        return update_at;
-    }
-
-    public void setUpdate_at(Timestamp update_at) {
-        this.update_at = update_at;
     }
 }

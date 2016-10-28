@@ -19,6 +19,6 @@ public class ProxyUtils {
         return (Calculator) Proxy.newProxyInstance(
                 ProxyUtils.class.getClassLoader(),
                 new Class<?>[]{Calculator.class},
-                new CacheInvocationHandler<Integer>(classInstance));
+                new CacheHandler(classInstance));
     }
 }
