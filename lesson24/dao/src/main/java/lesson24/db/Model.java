@@ -1,16 +1,19 @@
 package lesson24.db;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface Model {
-    Optional<Object> getById(Long id);
+    Optional<?> getById(Long id);
 
-    Long create(Object table);
+    Long create(Object model);
 
-    boolean update(Object table);
+    boolean update(Object model);
 
-    Optional<List<Object>> getList();
+    boolean remove(Long id);
 
-    Optional<List<Object>> getList(String field, String value);
+    Optional<List<?>> getList();
+
+    Optional<List<?>> getList(String field, String value);
 }

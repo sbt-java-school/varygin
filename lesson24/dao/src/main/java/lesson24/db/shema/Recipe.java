@@ -1,7 +1,4 @@
-package lesson24.dao;
-
-import java.util.ArrayList;
-import java.util.List;
+package lesson24.db.shema;
 
 public class Recipe {
     private Long id;

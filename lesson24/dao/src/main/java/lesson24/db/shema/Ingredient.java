@@ -1,4 +1,4 @@
-package lesson24.dao;
+package lesson24.db.shema;
 
 public class Ingredient {
     private Long id;
@@ -32,8 +32,6 @@ public class Ingredient {
     public void setName(String name) {
         this.name = name;
     }
-
-
 
     @Override
     public String toString() {

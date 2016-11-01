@@ -1,4 +1,4 @@
-package lesson24.dao;
+package lesson24.db.shema;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

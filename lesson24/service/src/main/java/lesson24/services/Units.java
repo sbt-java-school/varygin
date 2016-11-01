@@ -3,7 +3,7 @@ package lesson24.services;
 import lesson24.db.DaoFactory;
 import lesson24.db.Model;
 import lesson24.db.components.UnitsDao;
-import lesson24.dao.Unit;
+import lesson24.db.shema.Unit;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class Units {
     public static List<Unit> getList() {
         try (DaoFactory factory = new DaoFactory()) {
             Model unitsDao = factory.create(UnitsDao.class);
-            Optional<List<Object>> unitsDaoList = unitsDao.getList();
+            Optional<List<?>> unitsDaoList = unitsDao.getList();
             if (!unitsDaoList.isPresent()) {
                 return null;
             }

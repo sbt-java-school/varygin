@@ -1,4 +1,4 @@
-package lesson24.dao;
+package lesson24.db.shema;
 
 public class Unit {
     private Long id;

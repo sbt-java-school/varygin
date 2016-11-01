@@ -3,11 +3,13 @@ package lesson24.services;
 import lesson24.db.DaoFactory;
 import lesson24.db.Model;
 import lesson24.db.components.IngredientsDao;
-import lesson24.dao.Ingredient;
-import lesson24.dao.Unit;
+import lesson24.db.shema.Ingredient;
+import lesson24.db.shema.Unit;
 import lesson24.exceptions.BusinessException;
 import org.apache.commons.lang.text.StrBuilder;
+import org.springframework.dao.DuplicateKeyException;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,8 +70,23 @@ public class Ingredients {
         validate();
         try (DaoFactory factory = new DaoFactory()) {
             if (ingredient.getId() == null) {
-                Model ingredientsDao = factory.create(IngredientsDao.class);
-                ingredient.setId(ingredientsDao.create(ingredient));
+                Long id = factory.create(IngredientsDao.class).create(ingredient);
+                ingredient.setId(id);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException("Ингредиент с таким названием уже существует");
+        } catch (Exception e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public void remove() {
+        if (ingredient.getId() == null) {
+            throw new BusinessException("Ингредиент не найден");
+        }
+        try (DaoFactory factory = new DaoFactory()) {
+            if (!factory.create(IngredientsDao.class).remove(ingredient.getId())) {
+                throw new BusinessException("Невозможно удалить ингредиент");
             }
         } catch (Exception e) {
             throw new BusinessException(e);
@@ -91,7 +108,7 @@ public class Ingredients {
     public static List<Ingredient> getList() {
         try (DaoFactory factory = new DaoFactory()) {
             Model ingredientsDao = factory.create(IngredientsDao.class);
-            Optional<List<Object>> ingredientsDaoList = ingredientsDao.getList();
+            Optional<List<?>> ingredientsDaoList = ingredientsDao.getList();
             if (!ingredientsDaoList.isPresent()) {
                 return null;
             }
@@ -103,5 +120,9 @@ public class Ingredients {
         } catch (Exception e) {
             throw new BusinessException(e);
         }
+    }
+
+    public Ingredient getIngredient() {
+        return ingredient;
     }
 }

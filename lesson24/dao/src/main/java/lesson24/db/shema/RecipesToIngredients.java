@@ -1,4 +1,4 @@
-package lesson24.dao;
+package lesson24.db.shema;
 
 public class RecipesToIngredients {
     @TableField
@@ -47,5 +47,27 @@ public class RecipesToIngredients {
 
     public void setUnit_id(Long unit_id) {
         this.unit_id = unit_id;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getRecipe_id().hashCode();
+        result = 31 * result + getIngredient_id().hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RecipesToIngredients that = (RecipesToIngredients) o;
+
+        return getRecipe_id().equals(that.getRecipe_id()) &&
+                getIngredient_id().equals(that.getIngredient_id());
     }
 }

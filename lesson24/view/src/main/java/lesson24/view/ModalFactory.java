@@ -3,12 +3,19 @@ package lesson24.view;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lesson24.exceptions.BusinessException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
+
+import static javafx.scene.control.Alert.*;
+import static javafx.scene.control.ButtonBar.*;
 
 public class ModalFactory {
     public static void create(URL resource, String title, Stage owner, Control control) {
@@ -37,11 +44,36 @@ public class ModalFactory {
     }
 
     public static void error(Stage stage, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
+        Alert alert = new Alert(AlertType.ERROR);
         alert.initOwner(stage);
         alert.setTitle("Ошибка");
+        alert.setHeaderText(null);
         alert.setContentText(message);
 
         alert.showAndWait();
+    }
+
+    public static void confirm(Stage stage, String message, Runnable forYes, Runnable forNo) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.initOwner(stage);
+        alert.setTitle("Подтверждение");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        ButtonType yes = new ButtonType("Да", ButtonData.OK_DONE);
+        ButtonType no = new ButtonType("Нет", ButtonData.NO);
+        ButtonType cancel = new ButtonType("Отмена", ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(cancel, no, yes);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (!result.isPresent()) {
+            return;
+        }
+        ButtonData buttonData = result.get().getButtonData();
+        if (buttonData == ButtonData.OK_DONE) {
+            forYes.run();
+        } else if (buttonData == ButtonData.NO) {
+            forNo.run();
+        }
     }
 }
