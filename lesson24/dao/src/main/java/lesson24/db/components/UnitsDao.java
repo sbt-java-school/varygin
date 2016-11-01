@@ -1,14 +1,12 @@
 package lesson24.db.components;
 
 import lesson24.db.Model;
-import lesson24.db.dao.Unit;
+import lesson24.dao.Unit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 public class UnitsDao extends DaoModel implements Model {

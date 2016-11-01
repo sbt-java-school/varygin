@@ -31,16 +31,16 @@ public class ModalFactory {
 
             dialogStage.showAndWait();
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException("Невозможно создать всплывающее окно, " +
+                    "повторите попытку или перезагрузите приложение");
         }
     }
 
-    public static void error(Stage stage, String message, String text) {
+    public static void error(Stage stage, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initOwner(stage);
         alert.setTitle("Ошибка");
-        alert.setHeaderText(message);
-        alert.setContentText(text);
+        alert.setContentText(message);
 
         alert.showAndWait();
     }

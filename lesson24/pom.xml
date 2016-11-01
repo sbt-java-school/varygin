@@ -32,6 +32,7 @@
     <modules>
         <module>dao</module>
         <module>view</module>
+        <module>service</module>
     </modules>
 
 

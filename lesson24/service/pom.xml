@@ -9,14 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>view</artifactId>
+    <artifactId>service</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>lesson24.home</groupId>
-            <artifactId>service</artifactId>
+            <artifactId>dao</artifactId>
             <version>dev</version>
         </dependency>
     </dependencies>
-
 
 </project>

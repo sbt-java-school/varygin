@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lesson24.exceptions.BusinessException;
 import lesson24.view.Control;
 import lesson24.view.Main;
 import lesson24.view.ModalFactory;
@@ -48,12 +49,16 @@ public class HomePage implements Control {
 
     @FXML
     private void create() {
-        ModalFactory.create(
-                getClass().getResource("../recipe/create.fxml"),
-                "Добавление рецепта",
-                stage,
-                this
-        );
+        try {
+            ModalFactory.create(
+                    getClass().getResource("../recipe/create.fxml"),
+                    "Добавление рецепта",
+                    stage,
+                    this
+            );
+        } catch (BusinessException e) {
+            ModalFactory.error(stage, e.getMessage());
+        }
     }
 
     @FXML

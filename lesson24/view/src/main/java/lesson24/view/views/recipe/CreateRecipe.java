@@ -6,18 +6,18 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import lesson24.db.dao.Ingredient;
-import lesson24.db.dao.Recipe;
+import lesson24.dao.Recipe;
+import lesson24.exceptions.BusinessException;
+import lesson24.services.Ingredients;
+import lesson24.services.Recipes;
 import lesson24.view.Control;
 import lesson24.view.ModalFactory;
 import lesson24.view.views.home.HomePage;
 
-import java.util.List;
-
 public class CreateRecipe implements Control {
     private Stage stage;
     private HomePage control;
-    private Recipe recipe;
+    private Recipes recipeService;
 
     @FXML
     private TextField recipeName;
@@ -30,9 +30,13 @@ public class CreateRecipe implements Control {
     @FXML
     private Button cancelButton;
     @FXML
-    private ListView<Ingredient> ingredients;
+    private ListView<Ingredients> ingredients;
 
     public CreateRecipe() {
+    }
+
+    public void edit(Recipe recipe) {
+        recipeService = new Recipes(recipe);
     }
 
     @Override
@@ -40,7 +44,7 @@ public class CreateRecipe implements Control {
         this.stage = stage;
     }
 
-    public void addIngredient(Ingredient ingredient) {
+    public void addIngredient(Ingredients ingredient) {
         ingredients.getItems().add(ingredient);
     }
 
@@ -51,7 +55,6 @@ public class CreateRecipe implements Control {
 
     @FXML
     private void initialize() {
-        this.recipe = new Recipe();
     }
 
     @FXML
@@ -61,17 +64,30 @@ public class CreateRecipe implements Control {
 
     @FXML
     private void save() {
-//        ObservableList<String> items = ingredients.getItems();
+        try {
+            if (recipeService == null) {
+                recipeService = new Recipes(recipeName.getText(), recipeDescription.getText());
+            } else {
+                recipeService.setFields(recipeName.getText(), recipeDescription.getText());
+            }
+            recipeService.setIngredients(ingredients.getItems());
+            recipeService.save();
+        } catch (BusinessException e) {
+            ModalFactory.error(stage, e.getMessage());
+        }
     }
 
     @FXML
     private void addIngredients() {
-        ModalFactory.create(
-                getClass().getResource("../ingredient/add.fxml"),
-                "Добавление ингредиента",
-                stage,
-                this
-        );
-        recipe.setIngredients(ingredients.getItems());
+        try {
+            ModalFactory.create(
+                    getClass().getResource("../ingredient/add.fxml"),
+                    "Добавление ингредиента",
+                    stage,
+                    this
+            );
+        } catch (BusinessException e) {
+            ModalFactory.error(stage, e.getMessage());
+        }
     }
 }

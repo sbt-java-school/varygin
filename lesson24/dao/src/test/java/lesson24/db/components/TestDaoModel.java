@@ -2,8 +2,8 @@ package lesson24.db.components;
 
 import lesson24.db.DaoFactory;
 import lesson24.db.Model;
-import lesson24.db.dao.Recipe;
-import lesson24.db.dao.Unit;
+import lesson24.dao.Recipe;
+import lesson24.dao.Unit;
 import org.junit.Test;
 
 import java.util.Optional;

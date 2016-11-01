@@ -31,5 +31,10 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>lesson24.home</groupId>
+            <artifactId>service</artifactId>
+            <version>dev</version>
+        </dependency>
     </dependencies>
 </project>

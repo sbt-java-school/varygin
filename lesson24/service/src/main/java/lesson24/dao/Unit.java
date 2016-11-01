@@ -1,4 +1,4 @@
-package lesson24.db.dao;
+package lesson24.dao;
 
 public class Unit {
     private Long id;
