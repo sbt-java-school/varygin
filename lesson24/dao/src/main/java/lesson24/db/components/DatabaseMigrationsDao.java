@@ -16,14 +16,14 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 @Repository
-public class DatabaseMigrationsImpl implements DatabaseMigrations {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMigrationsImpl.class);
+public class DatabaseMigrationsDao implements DatabaseMigrations {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMigrationsDao.class);
 
     private final JdbcTemplate template;
     private boolean needClead;
 
     @Autowired
-    public DatabaseMigrationsImpl(JdbcTemplate template) {
+    public DatabaseMigrationsDao(JdbcTemplate template) {
         this.template = template;
     }
 

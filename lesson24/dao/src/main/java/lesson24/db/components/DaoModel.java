@@ -8,9 +8,11 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +24,13 @@ import static java.util.stream.Collectors.toList;
 
 abstract class DaoModel implements Model {
     final NamedParameterJdbcTemplate jdbcTemplate;
+    final SimpleJdbcInsert simpleJdbcInsert;
 
-    DaoModel(NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    DaoModel(DataSource dataSource) {
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+                .withTableName(getTable())
+                .usingGeneratedKeyColumns("id");
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     @Override
@@ -40,19 +46,8 @@ abstract class DaoModel implements Model {
     @Override
     public Long create(Object model) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(model);
-        List<String> classFields = getClassFields(model);
-        String[] wrapFields = classFields.stream()
-                .map(field -> "`" + field + "`").toArray(String[]::new);
-        String[] values = classFields.stream()
-                .map(field -> ":" + field).toArray(String[]::new);
-
-        String query = "INSERT INTO " + getTable()
-                + " (" + StringUtils.join(wrapFields, ", ") + ")"
-                + " VALUES (" + StringUtils.join(values, ", ") + ")";
-
-        KeyHolder holder = new GeneratedKeyHolder();
-        jdbcTemplate.update(query, params, holder);
-        return holder.getKey().longValue();
+        Number number = simpleJdbcInsert.executeAndReturnKey(params);
+        return number.longValue();
     }
 
     @Override
