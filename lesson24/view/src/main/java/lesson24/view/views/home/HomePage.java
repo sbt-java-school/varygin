@@ -1,18 +1,10 @@
 package lesson24.view.views.home;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import lesson24.exceptions.BusinessException;
 import lesson24.view.Control;
-import lesson24.view.Main;
 import lesson24.view.ModalFactory;
-
-import java.io.IOException;
 
 public class HomePage implements Control {
     private Control control;
@@ -44,21 +36,14 @@ public class HomePage implements Control {
 
     @FXML
     private void search() {
-
+        ModalFactory.create(getClass().getResource("../search/search.fxml"),
+                "Поиск", stage, this);
     }
 
     @FXML
     private void create() {
-        try {
-            ModalFactory.create(
-                    getClass().getResource("../recipe/create.fxml"),
-                    "Добавление рецепта",
-                    stage,
-                    this
-            );
-        } catch (BusinessException e) {
-            ModalFactory.error(stage, e.getMessage());
-        }
+        ModalFactory.create(getClass().getResource("../recipe/create.fxml"),
+                "Добавление рецепта", stage, this);
     }
 
     @FXML

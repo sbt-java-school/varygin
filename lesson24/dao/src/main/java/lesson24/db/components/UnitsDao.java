@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.Optional;
 
+import static lesson24.db.components.Tables.UNITS;
+
 @Repository
 public class UnitsDao extends DaoModel implements Model {
 
@@ -37,6 +39,6 @@ public class UnitsDao extends DaoModel implements Model {
 
     @Override
     protected String getTable() {
-        return "units";
+        return UNITS.getName();
     }
 }

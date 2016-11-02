@@ -79,12 +79,12 @@ public class RecipeService {
             return null;
         }
 
-        Optional<List<?>> listOptional = daoModel.getList("recipe_id", recipe.getId().toString());
-        if (!listOptional.isPresent()) {
+        List<?> relationsList = daoModel.getList("recipe_id", recipe.getId().toString());
+        if (relationsList.isEmpty()) {
             return relations;
         }
 
-        List<RecipesToIngredients> existList = listOptional.get().stream()
+        List<RecipesToIngredients> existList = relationsList.stream()
                 .map(item -> (RecipesToIngredients) item)
                 .collect(toList());
         relations.removeAll(existList);
@@ -157,5 +157,17 @@ public class RecipeService {
     public void setFields(String name, String description) {
         recipe.setName(name);
         recipe.setDescription(description);
+    }
+
+    public static List<Recipe> getList() {
+        try (DaoFactory factory = new DaoFactory()) {
+            Model recipesDao = factory.create(RecipesDao.class);
+            List<?> modelsList = recipesDao.getList();
+            return modelsList.stream()
+                    .map(item -> (Recipe) item)
+                    .collect(toList());
+        } catch (Exception e) {
+            throw new BusinessException(e);
+        }
     }
 }

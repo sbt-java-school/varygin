@@ -47,7 +47,7 @@ public interface Model {
      *
      * @return список записей вызываемой модели
      */
-    Optional<List<?>> getList();
+    List<?> getList();
 
     /**
      * Запрос на получение списка записей из таблицы модели
@@ -57,5 +57,5 @@ public interface Model {
      * @param value искомое значение поля
      * @return список записей вызываемой модели
      */
-    Optional<List<?>> getList(String field, String value);
+    List<?> getList(String field, String value);
 }

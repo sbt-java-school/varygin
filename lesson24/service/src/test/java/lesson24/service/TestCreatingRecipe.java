@@ -18,10 +18,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestCreatingRecipe {
@@ -40,8 +40,8 @@ public class TestCreatingRecipe {
         } catch (BusinessException e) {
             try (DaoFactory factory = new DaoFactory()) {
                 Model recipesDao = factory.create(RecipesDao.class);
-                Optional<List<?>> listOptional = recipesDao.getList("name", "test");
-                assertFalse(listOptional.isPresent());
+                List<?> listOptional = recipesDao.getList("name", "test");
+                assertTrue(listOptional.isEmpty());
             }
         }
     }
@@ -73,31 +73,31 @@ public class TestCreatingRecipe {
 
         try (DaoFactory factory = new DaoFactory()) {
             IngredientsDao ingredientsDao = factory.create(IngredientsDao.class);
-            Optional<List<?>> ingList = ingredientsDao.getList("id", ingredients.get(0).getIngredient().getId().toString());
-            assertTrue(ingList.isPresent());
+            List<?> ingList = ingredientsDao.getList("id", ingredients.get(0).getIngredient().getId().toString());
+            assertTrue(!ingList.isEmpty());
 
             Model recipesDao = factory.create(RecipesDao.class);
-            Optional<List<?>> listOptional = recipesDao.getList("name", "test");
-            assertTrue(listOptional.isPresent());
-            Recipe recipe = (Recipe) listOptional.get().get(0);
+            List<?> listOptional = recipesDao.getList("name", "test");
+            assertTrue(!listOptional.isEmpty());
+            Recipe recipe = (Recipe) listOptional.get(0);
 
             RecipesToIngredientsDao recipesToIngredients = factory.create(RecipesToIngredientsDao.class);
-            Optional<List<?>> rtiList = recipesToIngredients.getList("recipe_id", recipe.getId().toString());
-            assertTrue(rtiList.isPresent());
+            List<?> rtiList = recipesToIngredients.getList("recipe_id", recipe.getId().toString());
+            assertTrue(!rtiList.isEmpty());
 
             //Удаление
             RecipeService recipeService1 = new RecipeService(recipe);
             recipeService1.remove();
 
-            Optional<List<?>> listOptional1 = recipesDao.getList("name", "test");
-            assertFalse(listOptional1.isPresent());
+            List<?> listOptional1 = recipesDao.getList("name", "test");
+            assertTrue(listOptional1.isEmpty());
 
-            Optional<List<?>> rtiList1 = recipesToIngredients.getList("recipe_id", recipe.getId().toString());
-            assertFalse(rtiList1.isPresent());
+            List<?> rtiList1 = recipesToIngredients.getList("recipe_id", recipe.getId().toString());
+            assertTrue(rtiList1.isEmpty());
 
             ingredients.forEach(IngredientService::remove);
-            Optional<List<?>> ingList1 = ingredientsDao.getList("id", ingredients.get(0).getIngredient().getId().toString());
-            assertFalse(ingList1.isPresent());
+            List<?> ingList1 = ingredientsDao.getList("id", ingredients.get(0).getIngredient().getId().toString());
+            assertTrue(ingList1.isEmpty());
         }
     }
 }

@@ -5,21 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Optional;
+
+import static lesson24.db.components.Tables.*;
 
 @Repository
 public class IngredientsDao extends DaoModel {
 
     @Autowired
-    public IngredientsDao( DataSource dataSource) {
-        super(dataSource);
+    public IngredientsDao(NamedParameterJdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
     }
 
     @Override
     protected String getTable() {
-        return "ingredients";
+        return INGREDIENTS.getName();
     }
 
     @Override

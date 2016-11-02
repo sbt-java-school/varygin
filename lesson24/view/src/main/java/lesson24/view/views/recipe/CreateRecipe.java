@@ -45,6 +45,11 @@ public class CreateRecipe implements Control {
         this.stage = stage;
     }
 
+    @Override
+    public void setParent(Control control) {
+        this.control = (HomePage) control;
+    }
+
     public void addIngredient(IngredientService ingredient) {
         ObservableList<IngredientService> items = ingredients.getItems();
         boolean result = items.stream().anyMatch(item ->
@@ -53,11 +58,6 @@ public class CreateRecipe implements Control {
             throw new BusinessException("Вы уже добавили этот ингредиент");
         }
         items.add(ingredient);
-    }
-
-    @Override
-    public void setParent(Control control) {
-        this.control = (HomePage) control;
     }
 
     @FXML
@@ -71,7 +71,7 @@ public class CreateRecipe implements Control {
 
     @FXML
     private void save() {
-        try {
+        ModalFactory.wrap(() -> {
             if (recipeService == null) {
                 recipeService = new RecipeService(recipeName.getText(), recipeDescription.getText());
             } else {
@@ -80,28 +80,18 @@ public class CreateRecipe implements Control {
             recipeService.setIngredients(ingredients.getItems());
             recipeService.save();
             cancel();
-        } catch (BusinessException e) {
-            ModalFactory.error(stage, e.getMessage());
-        }
+        }, stage);
     }
 
     @FXML
     private void addIngredients() {
-        try {
-            ModalFactory.create(
-                    getClass().getResource("../ingredient/add.fxml"),
-                    "Добавление ингредиента",
-                    stage,
-                    this
-            );
-        } catch (BusinessException e) {
-            ModalFactory.error(stage, e.getMessage());
-        }
+        ModalFactory.create(getClass().getResource("../ingredient/add.fxml"),
+                "Добавление ингредиента", stage, this);
     }
 
     @FXML
     private void removeIngredients() {
-        try {
+        ModalFactory.wrap(() -> {
             if (ingredients.getItems().isEmpty()) {
                 throw new BusinessException("Список ингредиентов пуст");
             }
@@ -122,8 +112,6 @@ public class CreateRecipe implements Control {
                         ingredients.getItems().removeAll(selectedItems);
                     }
             );
-        } catch (BusinessException e) {
-            ModalFactory.error(stage, e.getMessage());
-        }
+        }, stage);
     }
 }

@@ -1,7 +1,5 @@
 package lesson24.db.configuration;
 
-import lesson24.db.exception.BusinessException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -30,7 +28,7 @@ abstract class AbstractConfig implements Config {
 
             isInit = true;
         } catch (IOException e) {
-            throw new BusinessException("Can't load database properties", e);
+            throw new IllegalStateException(e);
         }
     }
 

@@ -5,18 +5,18 @@ import lesson24.db.Model;
 import lesson24.db.components.IngredientsDao;
 import lesson24.db.shema.Ingredient;
 import lesson24.db.shema.Unit;
-import lesson24.errors.ValidateMessages;
 import lesson24.exceptions.BusinessException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrBuilder;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
+import static java.util.Objects.*;
 import static java.util.stream.Collectors.toList;
 import static lesson24.errors.ValidateMessages.*;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * Сервис для обработки ингредиентов
@@ -85,10 +85,10 @@ public class IngredientService {
      * Валидация данных перед сохранением в базу данных
      */
     private void validate() {
-        if (Objects.isNull(ingredient) || !ingredient.isValid()) {
+        if (isNull(ingredient) || !ingredient.isValid()) {
             throw new BusinessException(INGREDIENT_NOT_SELECTED);
         }
-        if (Objects.isNull(unit) || !unit.isValid()) {
+        if (isNull(unit) || !unit.isValid()) {
             throw new BusinessException(UNIT_NOT_SELECTED);
         }
         try {
@@ -104,7 +104,7 @@ public class IngredientService {
      * Удаление ингредиента по идентификатору
      */
     public void remove() {
-        if (Objects.isNull(ingredient.getId())) {
+        if (isNull(ingredient.getId())) {
             throw new BusinessException(INGREDIENT_NOT_SELECTED);
         }
 
@@ -125,13 +125,9 @@ public class IngredientService {
     public static List<Ingredient> getList() {
         try (DaoFactory factory = new DaoFactory()) {
             Model ingredientsDao = factory.create(IngredientsDao.class);
-            Optional<List<?>> ingredientsDaoList = ingredientsDao.getList();
-            if (!ingredientsDaoList.isPresent()) {
-                return null;
-            }
+            List<?> ingredientsDaoList = ingredientsDao.getList();
 
-            return ingredientsDaoList.get()
-                    .stream()
+            return ingredientsDaoList.stream()
                     .map(item -> (Ingredient) item)
                     .collect(toList());
         } catch (Exception e) {
@@ -142,9 +138,9 @@ public class IngredientService {
     @Override
     public String toString() {
         StrBuilder tmp = new StrBuilder(ingredient.toString());
-        if (amount != null && unit != null) {
+        if (isNotBlank(tmpAmount) && nonNull(unit)) {
             tmp.append(": ")
-                    .append(amount.toString())
+                    .append(tmpAmount)
                     .append(" ")
                     .append(unit.getShort_name());
         }
@@ -161,5 +157,9 @@ public class IngredientService {
 
     public Unit getUnit() {
         return unit;
+    }
+
+    public String getTmpAmount() {
+        return tmpAmount;
     }
 }

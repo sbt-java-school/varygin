@@ -38,7 +38,7 @@ public class ModalFactory {
 
             dialogStage.showAndWait();
         } catch (IOException e) {
-            throw new RuntimeException("Невозможно создать всплывающее окно, " +
+            ModalFactory.error(owner, "Невозможно создать всплывающее окно, " +
                     "повторите попытку или перезагрузите приложение");
         }
     }
@@ -74,6 +74,14 @@ public class ModalFactory {
             forYes.run();
         } else if (buttonData == ButtonData.NO) {
             forNo.run();
+        }
+    }
+
+    public static void wrap(Runnable action, Stage stage) {
+        try {
+            action.run();
+        } catch (BusinessException e) {
+            ModalFactory.error(stage, e.getMessage());
         }
     }
 }

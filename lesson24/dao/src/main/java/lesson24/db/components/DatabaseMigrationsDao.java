@@ -20,7 +20,7 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMigrationsDao.class);
 
     private final JdbcTemplate template;
-    private boolean needClead;
+    private boolean needClear;
 
     @Autowired
     public DatabaseMigrationsDao(JdbcTemplate template) {
@@ -29,13 +29,16 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
 
     @Override
     public void migrate() {
-        if (needClead) {
+        if (needClear) {
+            LOGGER.info("Drop");
             executeScript("sql/drop/first");
             executeScript("sql/drop");
         }
+        LOGGER.info("Create");
         executeScript("sql/first");
         executeScript("sql");
         executeScript("sql/last");
+        LOGGER.info("Import");
         executeScript("sql/import");
     }
 
@@ -83,7 +86,7 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
     }
 
     @Override
-    public void needClear(boolean needClead) {
-        this.needClead = needClead;
+    public void needClear(boolean needClear) {
+        this.needClear = needClear;
     }
 }

@@ -7,8 +7,9 @@ import lesson24.db.shema.Ingredient;
 public class TestMigrations {
     public static void main(String[] args) {
         try (DaoFactory daoFactory = new DaoFactory()){
-            IngredientsDao migrations = daoFactory.create(IngredientsDao.class);
-            migrations.create(new Ingredient("Молоко"));
+            DatabaseMigrationsDao migrationsDao = daoFactory.create(DatabaseMigrationsDao.class);
+            migrationsDao.needClear(true);
+            migrationsDao.migrate();
         }
     }
 }

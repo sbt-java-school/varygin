@@ -49,17 +49,15 @@ public class AddIngredients implements Control {
 
     @FXML
     private void initialize() {
-        try {
+        ModalFactory.wrap(() -> {
             units.setItems(FXCollections.observableArrayList(UnitService.getList()));
             ingredients.setItems(FXCollections.observableArrayList(IngredientService.getList()));
-        } catch (BusinessException e) {
-            ModalFactory.error(stage, e.getMessage());
-        }
+        }, stage);
     }
 
     @FXML
     private void add() {
-        try {
+        ModalFactory.wrap(() -> {
             IngredientService ingredientService;
             if (!isEmpty(name.getText())) {
                 ingredientService = new IngredientService(name.getText(), units.getValue(), amount.getText());
@@ -69,9 +67,7 @@ public class AddIngredients implements Control {
             ingredientService.save();
             control.addIngredient(ingredientService);
             cancel();
-        } catch (BusinessException e) {
-            ModalFactory.error(stage, e.getMessage());
-        }
+        }, stage);
     }
 
     @FXML

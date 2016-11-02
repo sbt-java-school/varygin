@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS `ingredientService`
+DROP TABLE IF EXISTS `ingredients`

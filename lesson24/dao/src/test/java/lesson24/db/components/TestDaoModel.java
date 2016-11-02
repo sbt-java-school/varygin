@@ -4,12 +4,14 @@ import lesson24.db.DaoFactory;
 import lesson24.db.Model;
 import lesson24.db.shema.Recipe;
 import lesson24.db.shema.Unit;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Optional;
 
 public class TestDaoModel {
     @Test
+    @Ignore
     public void testCreate() throws Exception {
         Unit unit = new Unit("Грамм", "г.");
         Recipe recipeObj = new Recipe("test", "description");

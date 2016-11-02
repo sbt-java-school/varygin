@@ -24,16 +24,8 @@ public class UnitService {
     public static List<Unit> getList() {
         try (DaoFactory factory = new DaoFactory()) {
             Model unitsDao = factory.create(UnitsDao.class);
-            Optional<List<?>> unitsDaoList = unitsDao.getList();
-
-            if (!unitsDaoList.isPresent()) {
-                return null;
-            }
-
-            return unitsDaoList.get()
-                    .stream()
-                    .map(item -> (Unit) item)
-                    .collect(toList());
+            List<?> unitsDaoList = unitsDao.getList();
+            return unitsDaoList.stream().map(item -> (Unit) item).collect(toList());
         }
     }
 }

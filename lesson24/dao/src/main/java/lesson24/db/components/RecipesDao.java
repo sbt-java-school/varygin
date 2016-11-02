@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.Optional;
 
+import static lesson24.db.components.Tables.RECIPES;
+
 @Repository
 public class RecipesDao extends DaoModel implements Model {
 
@@ -19,7 +21,7 @@ public class RecipesDao extends DaoModel implements Model {
 
     @Override
     protected String getTable() {
-        return "recipes";
+        return RECIPES.getName();
     }
 
     @Override

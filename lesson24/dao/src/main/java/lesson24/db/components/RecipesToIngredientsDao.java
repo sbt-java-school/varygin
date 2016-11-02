@@ -1,21 +1,20 @@
 package lesson24.db.components;
 
 import lesson24.db.shema.RecipesToIngredients;
-import lesson24.db.exception.BusinessException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static lesson24.db.components.Tables.*;
 
 @Repository
 public class RecipesToIngredientsDao extends DaoModel {
@@ -26,7 +25,7 @@ public class RecipesToIngredientsDao extends DaoModel {
 
     @Override
     protected String getTable() {
-        return "recipes_to_ingredients";
+        return RELATIONS.getName();
     }
 
     @Override
@@ -41,7 +40,7 @@ public class RecipesToIngredientsDao extends DaoModel {
 
     @Override
     public Optional<?> getById(Long id) {
-        throw new BusinessException("Операция не поддерживается");
+        throw new IllegalStateException();
     }
 
     public boolean create(List<RecipesToIngredients> relations) {
@@ -77,5 +76,18 @@ public class RecipesToIngredientsDao extends DaoModel {
         SqlParameterSource params = new MapSqlParameterSource("value", id);
         int delete = jdbcTemplate.update(query, params);
         return delete == 1;
+    }
+
+    public List<Map<String, Object>> getByRecipeId(Long id) {
+        Objects.requireNonNull(id);
+        SqlParameterSource params = new MapSqlParameterSource("recipe_id", id);
+        String query = "SELECT rti.*, " +
+                "ig.name as ingredient_name," +
+                "u.name as unit_name, u.short_name " +
+                "FROM " + getTable() + " rti " +
+                "LEFT JOIN " + INGREDIENTS.getName() + " ig ON ig.id = rti.ingredient_id " +
+                "LEFT JOIN " + UNITS.getName() + " u ON u.id = rti.unit_id " +
+                "WHERE rti.recipe_id = :recipe_id";
+        return jdbcTemplate.queryForList(query, params);
     }
 }

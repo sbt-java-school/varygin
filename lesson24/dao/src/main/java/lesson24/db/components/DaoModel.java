@@ -3,16 +3,13 @@ package lesson24.db.components;
 import lesson24.db.Model;
 import lesson24.db.shema.TableField;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +21,9 @@ import static java.util.stream.Collectors.toList;
 
 abstract class DaoModel implements Model {
     final NamedParameterJdbcTemplate jdbcTemplate;
-    final SimpleJdbcInsert simpleJdbcInsert;
 
-    DaoModel(DataSource dataSource) {
-        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
-                .withTableName(getTable())
-                .usingGeneratedKeyColumns("id");
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    DaoModel(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -46,8 +39,19 @@ abstract class DaoModel implements Model {
     @Override
     public Long create(Object model) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(model);
-        Number number = simpleJdbcInsert.executeAndReturnKey(params);
-        return number.longValue();
+        List<String> classFields = getClassFields(model);
+        String[] wrapFields = classFields.stream()
+                .map(field -> "`" + field + "`").toArray(String[]::new);
+        String[] values = classFields.stream()
+                .map(field -> ":" + field).toArray(String[]::new);
+
+        String query = "INSERT INTO " + getTable()
+                + " (" + StringUtils.join(wrapFields, ", ") + ")"
+                + " VALUES (" + StringUtils.join(values, ", ") + ")";
+
+        KeyHolder holder = new GeneratedKeyHolder();
+        jdbcTemplate.update(query, params, holder);
+        return holder.getKey().longValue();
     }
 
     @Override
@@ -65,28 +69,23 @@ abstract class DaoModel implements Model {
     }
 
     @Override
-    public Optional<List<?>> getList() {
+    public List<?> getList() {
         return getList("1", "1");
     }
 
     @Override
-    public Optional<List<?>> getList(String field, String value) {
+    public List<?> getList(String field, String value) {
         String query = "SELECT * FROM " + getTable() + " WHERE " + field + " = :value";
         SqlParameterSource params = new MapSqlParameterSource("value", value);
         List<Map<String, Object>> listResult = jdbcTemplate.queryForList(query, params);
-        if (listResult.isEmpty()) {
-            return Optional.empty();
-        }
-        List<Object> objects = listResult.stream().map(this::init).collect(toList());
-        return Optional.of(objects);
+        return listResult.stream().map(this::init).collect(toList());
     }
 
     @Override
     public boolean remove(Long id) {
         Objects.requireNonNull(id);
         String query = "DELETE FROM " + getTable() + " WHERE id = :value";
-        SqlParameterSource params = new MapSqlParameterSource("value", id);
-        int delete = jdbcTemplate.update(query, params);
+        int delete = jdbcTemplate.update(query, new MapSqlParameterSource("value", id));
         return delete == 1;
     }
 

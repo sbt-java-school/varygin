@@ -9,9 +9,6 @@ public class Unit {
     @TableField
     private String short_name;
 
-    public Unit() {
-    }
-
     public Unit(String name, String short_name) {
         this(null, name, short_name);
     }
