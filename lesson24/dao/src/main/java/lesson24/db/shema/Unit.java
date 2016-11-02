@@ -1,5 +1,7 @@
 package lesson24.db.shema;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class Unit {
     private Long id;
     @TableField
@@ -42,6 +44,10 @@ public class Unit {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isValid() {
+        return isNotBlank(name) && id != null;
     }
 
     @Override

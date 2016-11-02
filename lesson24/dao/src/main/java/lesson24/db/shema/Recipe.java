@@ -1,5 +1,9 @@
 package lesson24.db.shema;
 
+import org.apache.commons.lang.StringUtils;
+
+import static org.apache.commons.lang.StringUtils.*;
+
 public class Recipe {
     private Long id;
     @TableField
@@ -42,5 +46,9 @@ public class Recipe {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isValid() {
+        return isNotBlank(name) && isNotBlank(description);
     }
 }

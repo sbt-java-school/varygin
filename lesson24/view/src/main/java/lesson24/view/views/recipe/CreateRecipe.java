@@ -6,9 +6,9 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lesson24.db.shema.Recipe;
 import lesson24.exceptions.BusinessException;
-import lesson24.services.Ingredients;
-import lesson24.services.Recipes;
-import lesson24.services.RecipesToIngredients;
+import lesson24.services.IngredientService;
+import lesson24.services.RecipeService;
+import lesson24.services.RelationService;
 import lesson24.view.Control;
 import lesson24.view.ModalFactory;
 import lesson24.view.views.home.HomePage;
@@ -16,7 +16,7 @@ import lesson24.view.views.home.HomePage;
 public class CreateRecipe implements Control {
     private Stage stage;
     private HomePage control;
-    private Recipes recipeService;
+    private RecipeService recipeService;
 
     @FXML
     private TextField recipeName;
@@ -31,13 +31,13 @@ public class CreateRecipe implements Control {
     @FXML
     private Button removeIngredientButton;
     @FXML
-    private ListView<Ingredients> ingredients;
+    private ListView<IngredientService> ingredients;
 
     public CreateRecipe() {
     }
 
     public void edit(Recipe recipe) {
-        recipeService = new Recipes(recipe);
+        recipeService = new RecipeService(recipe);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class CreateRecipe implements Control {
         this.stage = stage;
     }
 
-    public void addIngredient(Ingredients ingredient) {
-        ObservableList<Ingredients> items = ingredients.getItems();
+    public void addIngredient(IngredientService ingredient) {
+        ObservableList<IngredientService> items = ingredients.getItems();
         boolean result = items.stream().anyMatch(item ->
                 item.getIngredient().getName().equals(ingredient.getIngredient().getName()));
         if (result) {
@@ -73,7 +73,7 @@ public class CreateRecipe implements Control {
     private void save() {
         try {
             if (recipeService == null) {
-                recipeService = new Recipes(recipeName.getText(), recipeDescription.getText());
+                recipeService = new RecipeService(recipeName.getText(), recipeDescription.getText());
             } else {
                 recipeService.setFields(recipeName.getText(), recipeDescription.getText());
             }
@@ -105,7 +105,7 @@ public class CreateRecipe implements Control {
             if (ingredients.getItems().isEmpty()) {
                 throw new BusinessException("Список ингредиентов пуст");
             }
-            ObservableList<Ingredients> selectedItems = ingredients.getSelectionModel().getSelectedItems();
+            ObservableList<IngredientService> selectedItems = ingredients.getSelectionModel().getSelectedItems();
             if (selectedItems.isEmpty()) {
                 throw new BusinessException("Не выбрано ни одного ингредиента");
             }
@@ -114,11 +114,11 @@ public class CreateRecipe implements Control {
                     "Удалить только из списка рецепта? " +
                             "При выборе 'Нет' ингредиент будет удалён из базы данных.",
                     () -> {
-                        selectedItems.forEach(RecipesToIngredients::removeByIngredient);
+                        selectedItems.forEach(RelationService::removeByIngredient);
                         ingredients.getItems().removeAll(selectedItems);
                     }, () -> {
-                        selectedItems.forEach(RecipesToIngredients::removeByIngredient);
-                        selectedItems.forEach(Ingredients::remove);
+                        selectedItems.forEach(RelationService::removeByIngredient);
+                        selectedItems.forEach(IngredientService::remove);
                         ingredients.getItems().removeAll(selectedItems);
                     }
             );

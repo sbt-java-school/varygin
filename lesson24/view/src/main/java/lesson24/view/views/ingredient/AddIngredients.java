@@ -9,8 +9,8 @@ import javafx.stage.Stage;
 import lesson24.db.shema.Ingredient;
 import lesson24.db.shema.Unit;
 import lesson24.exceptions.BusinessException;
-import lesson24.services.Ingredients;
-import lesson24.services.Units;
+import lesson24.services.IngredientService;
+import lesson24.services.UnitService;
 import lesson24.view.Control;
 import lesson24.view.ModalFactory;
 import lesson24.view.views.recipe.CreateRecipe;
@@ -50,8 +50,8 @@ public class AddIngredients implements Control {
     @FXML
     private void initialize() {
         try {
-            units.setItems(FXCollections.observableArrayList(Units.getList()));
-            ingredients.setItems(FXCollections.observableArrayList(Ingredients.getList()));
+            units.setItems(FXCollections.observableArrayList(UnitService.getList()));
+            ingredients.setItems(FXCollections.observableArrayList(IngredientService.getList()));
         } catch (BusinessException e) {
             ModalFactory.error(stage, e.getMessage());
         }
@@ -60,11 +60,11 @@ public class AddIngredients implements Control {
     @FXML
     private void add() {
         try {
-            Ingredients ingredientService;
+            IngredientService ingredientService;
             if (!isEmpty(name.getText())) {
-                ingredientService = new Ingredients(name.getText(), units.getValue(), amount.getText());
+                ingredientService = new IngredientService(name.getText(), units.getValue(), amount.getText());
             } else {
-                ingredientService = new Ingredients(ingredients.getValue(), units.getValue(), amount.getText());
+                ingredientService = new IngredientService(ingredients.getValue(), units.getValue(), amount.getText());
             }
             ingredientService.save();
             control.addIngredient(ingredientService);

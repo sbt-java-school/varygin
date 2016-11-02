@@ -14,11 +14,18 @@ import static java.util.stream.Collectors.toList;
  * Сервис для взаимодействия представления с данными
  * из таблицы units базы данных
  */
-public class Units {
+public class UnitService {
+
+    /**
+     * Осуществляет запрос на выборку всех единиц измерения в БД
+     *
+     * @return список единиц измерения
+     */
     public static List<Unit> getList() {
         try (DaoFactory factory = new DaoFactory()) {
             Model unitsDao = factory.create(UnitsDao.class);
             Optional<List<?>> unitsDaoList = unitsDao.getList();
+
             if (!unitsDaoList.isPresent()) {
                 return null;
             }

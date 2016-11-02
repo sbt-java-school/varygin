@@ -6,11 +6,11 @@ public class RecipesToIngredients {
     @TableField
     private Long ingredient_id;
     @TableField
-    private Integer amount;
+    private Double amount;
     @TableField
     private Long unit_id;
 
-    public RecipesToIngredients(Long recipe_id, Long ingredient_id, Integer amount, Long unit_id) {
+    public RecipesToIngredients(Long recipe_id, Long ingredient_id, Double amount, Long unit_id) {
         this.recipe_id = recipe_id;
         this.ingredient_id = ingredient_id;
         this.amount = amount;
@@ -33,11 +33,11 @@ public class RecipesToIngredients {
         this.ingredient_id = ingredient_id;
     }
 
-    public Integer getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

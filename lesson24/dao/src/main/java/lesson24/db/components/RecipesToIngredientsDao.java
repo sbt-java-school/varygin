@@ -34,7 +34,7 @@ public class RecipesToIngredientsDao extends DaoModel {
         return new RecipesToIngredients(
                 ((Number) resultMap.get("recipe_id")).longValue(),
                 ((Number) resultMap.get("ingredient_id")).longValue(),
-                ((Number) resultMap.get("amount")).intValue(),
+                ((Number) resultMap.get("amount")).doubleValue(),
                 ((Number) resultMap.get("unit_id")).longValue()
         );
     }
@@ -44,8 +44,8 @@ public class RecipesToIngredientsDao extends DaoModel {
         throw new BusinessException("Операция не поддерживается");
     }
 
-    public boolean create(List<RecipesToIngredients> recipesToIngredients) {
-        if (recipesToIngredients == null) {
+    public boolean create(List<RecipesToIngredients> relations) {
+        if (Objects.isNull(relations) || relations.isEmpty()) {
             return false;
         }
         List<String> classFields = getClassFields(RecipesToIngredients.class);
@@ -58,7 +58,7 @@ public class RecipesToIngredientsDao extends DaoModel {
                 + " (" + StringUtils.join(wrapFields, ", ") + ")"
                 + " VALUES (" + StringUtils.join(values, ", ") + ")";
 
-        SqlParameterSource[] params = SqlParameterSourceUtils.createBatch(recipesToIngredients.toArray());
+        SqlParameterSource[] params = SqlParameterSourceUtils.createBatch(relations.toArray());
         jdbcTemplate.batchUpdate(query, params);
         return true;
     }

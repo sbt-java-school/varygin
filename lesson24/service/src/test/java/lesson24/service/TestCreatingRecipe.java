@@ -6,17 +6,14 @@ import lesson24.db.components.IngredientsDao;
 import lesson24.db.components.RecipesDao;
 import lesson24.db.components.RecipesToIngredientsDao;
 import lesson24.db.shema.Recipe;
-import lesson24.db.shema.RecipesToIngredients;
 import lesson24.db.shema.Unit;
 import lesson24.exceptions.BusinessException;
-import lesson24.services.Ingredients;
-import lesson24.services.Recipes;
-import org.junit.Assert;
+import lesson24.services.IngredientService;
+import lesson24.services.RecipeService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
@@ -29,16 +26,16 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TestCreatingRecipe {
     @Mock
-    public List<Ingredients> mockedIngredientsList;
+    public List<IngredientService> mockedIngredientServiceList;
 
     @Test
     @Ignore
     public void transactions() throws Exception {
-        when(mockedIngredientsList.size()).thenThrow(new BusinessException("Test!"));
+        when(mockedIngredientServiceList.size()).thenThrow(new BusinessException("Test!"));
         try {
-            Recipes recipes = new Recipes("test", "descr");
-            recipes.setIngredients(mockedIngredientsList);
-            recipes.save();
+            RecipeService recipeService = new RecipeService("test", "descr");
+            recipeService.setIngredients(mockedIngredientServiceList);
+            recipeService.save();
             fail();
         } catch (BusinessException e) {
             try (DaoFactory factory = new DaoFactory()) {
@@ -51,28 +48,28 @@ public class TestCreatingRecipe {
 
     @Test(expected = BusinessException.class)
     public void wrongName() {
-        Recipes recipes = new Recipes("", "descr");
-        recipes.save();
+        RecipeService recipeService = new RecipeService("", "descr");
+        recipeService.save();
     }
 
     @Test(expected = BusinessException.class)
     public void wrongDescription() {
-        Recipes recipes = new Recipes("test", "");
-        recipes.save();
+        RecipeService recipeService = new RecipeService("test", "");
+        recipeService.save();
     }
 
     @Test
     public void createAndDelete() {
-        Recipes recipes = new Recipes("test", "descr");
+        RecipeService recipeService = new RecipeService("test", "descr");
         Unit unit = new Unit(1L, "test1", "ttt");
-        List<Ingredients> ingredients = Arrays.asList(
-                new Ingredients("test1", unit, "10"),
-                new Ingredients("test2", unit, "15"),
-                new Ingredients("test3", unit, "20")
+        List<IngredientService> ingredients = Arrays.asList(
+                new IngredientService("test1", unit, "10"),
+                new IngredientService("test2", unit, "15"),
+                new IngredientService("test3", unit, "20")
         );
-        ingredients.forEach(Ingredients::save);
-        recipes.setIngredients(ingredients);
-        recipes.save();
+        ingredients.forEach(IngredientService::save);
+        recipeService.setIngredients(ingredients);
+        recipeService.save();
 
         try (DaoFactory factory = new DaoFactory()) {
             IngredientsDao ingredientsDao = factory.create(IngredientsDao.class);
@@ -89,8 +86,8 @@ public class TestCreatingRecipe {
             assertTrue(rtiList.isPresent());
 
             //Удаление
-            Recipes recipes1 = new Recipes(recipe);
-            recipes1.remove();
+            RecipeService recipeService1 = new RecipeService(recipe);
+            recipeService1.remove();
 
             Optional<List<?>> listOptional1 = recipesDao.getList("name", "test");
             assertFalse(listOptional1.isPresent());
@@ -98,7 +95,7 @@ public class TestCreatingRecipe {
             Optional<List<?>> rtiList1 = recipesToIngredients.getList("recipe_id", recipe.getId().toString());
             assertFalse(rtiList1.isPresent());
 
-            ingredients.forEach(Ingredients::remove);
+            ingredients.forEach(IngredientService::remove);
             Optional<List<?>> ingList1 = ingredientsDao.getList("id", ingredients.get(0).getIngredient().getId().toString());
             assertFalse(ingList1.isPresent());
         }

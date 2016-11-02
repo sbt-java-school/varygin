@@ -1,5 +1,7 @@
 package lesson24.db.shema;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class Ingredient {
     private Long id;
     @TableField
@@ -31,6 +33,10 @@ public class Ingredient {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isValid() {
+        return isNotBlank(name);
     }
 
     @Override

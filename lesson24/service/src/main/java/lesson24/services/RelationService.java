@@ -7,9 +7,17 @@ import lesson24.exceptions.BusinessException;
 
 import java.util.Objects;
 
-public class RecipesToIngredients {
-    public static void removeByIngredient(Ingredients ingredients) {
-        Ingredient ingredient = ingredients.getIngredient();
+public class RelationService {
+
+    /**
+     * Метод осущствляет запрос на удаление всех связей
+     * рецепта по идентификатору ингредиента
+     *
+     * @param ingredientService сервис ингредиента
+     */
+    public static void removeByIngredient(IngredientService ingredientService) {
+        Ingredient ingredient = ingredientService.getIngredient();
+
         Objects.requireNonNull(ingredient);
         try (DaoFactory factory = new DaoFactory()) {
             RecipesToIngredientsDao recipesToIngredients = factory.create(RecipesToIngredientsDao.class);
