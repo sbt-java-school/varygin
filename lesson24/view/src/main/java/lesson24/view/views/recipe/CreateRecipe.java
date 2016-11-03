@@ -12,10 +12,11 @@ import lesson24.services.RelationService;
 import lesson24.view.Control;
 import lesson24.view.ModalFactory;
 import lesson24.view.views.home.HomePage;
+import lesson24.view.views.ingredient.AddIngredients;
 
 public class CreateRecipe implements Control {
     private Stage stage;
-    private HomePage control;
+    private Control control;
     private RecipeService recipeService;
 
     @FXML
@@ -36,8 +37,11 @@ public class CreateRecipe implements Control {
     public CreateRecipe() {
     }
 
-    public void edit(Recipe recipe) {
+    public void editRecipe(Recipe recipe, ListView<IngredientService> ingredients) {
         recipeService = new RecipeService(recipe);
+        recipeName.setText(recipe.getName());
+        recipeDescription.setText(recipe.getDescription());
+        this.ingredients.setItems(ingredients.getItems());
     }
 
     @Override
@@ -47,7 +51,7 @@ public class CreateRecipe implements Control {
 
     @Override
     public void setParent(Control control) {
-        this.control = (HomePage) control;
+        this.control = control;
     }
 
     public void addIngredient(IngredientService ingredient) {
@@ -86,7 +90,9 @@ public class CreateRecipe implements Control {
     @FXML
     private void addIngredients() {
         ModalFactory.create(getClass().getResource("../ingredient/add.fxml"),
-                "Добавление ингредиента", stage, this);
+                "Добавление ингредиента", stage, controller -> {
+                    controller.setParent(this);
+                });
     }
 
     @FXML

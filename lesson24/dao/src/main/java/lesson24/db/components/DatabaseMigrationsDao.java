@@ -1,10 +1,12 @@
 package lesson24.db.components;
 
 import lesson24.db.DatabaseMigrations;
+import lesson24.db.configuration.JdbcConfig;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +16,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Repository
 public class DatabaseMigrationsDao implements DatabaseMigrations {
@@ -29,15 +32,13 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
 
     @Override
     public void migrate() {
+        String driver = JdbcConfig.getInstance().getDriver();
         if (needClear) {
             LOGGER.info("Drop");
-            executeScript("sql/drop/first");
             executeScript("sql/drop");
         }
         LOGGER.info("Create");
-        executeScript("sql/first");
-        executeScript("sql");
-        executeScript("sql/last");
+        executeScript("sql/" + driver);
         LOGGER.info("Import");
         executeScript("sql/import");
     }
@@ -56,7 +57,11 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
                 if (pathFile.isFile()) {
                     executeFile(pathFile);
                 } else if (pathFile.isDirectory()) {
-                    Collection<File> files = FileUtils.listFiles(pathFile, null, false);
+                    Collection<File> files = FileUtils
+                            .listFiles(pathFile, null, false)
+                            .stream()
+                            .sorted((file1, file2) -> file1.getName().compareTo(file2.getName()))
+                            .collect(Collectors.toList());
                     files.forEach(this::executeFile);
                 }
             } else {
@@ -71,6 +76,8 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
         try {
             LOGGER.info("New file execution: {}", file.getName());
             executeSql(FileUtils.readFileToString(file));
+        } catch (DuplicateKeyException e) {
+            LOGGER.debug("Попытка дублирования записи");
         } catch (SQLException e) {
             throw new IllegalStateException("Bad script: " + file.getName(), e);
         } catch (IOException e) {

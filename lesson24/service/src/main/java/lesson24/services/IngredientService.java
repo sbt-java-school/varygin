@@ -6,23 +6,23 @@ import lesson24.db.components.IngredientsDao;
 import lesson24.db.shema.Ingredient;
 import lesson24.db.shema.Unit;
 import lesson24.exceptions.BusinessException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrBuilder;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.util.List;
-import java.util.Objects;
 
-import static java.util.Objects.*;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static lesson24.errors.ValidateMessages.*;
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Сервис для обработки ингредиентов
  * и сохранения / изменения / удаления их в базе данных
  */
 public class IngredientService {
+    private static final int MAX_NAME_LENGTH = 50;
     private final String tmpAmount;
     private Double amount;
     private Ingredient ingredient;
@@ -87,6 +87,9 @@ public class IngredientService {
     private void validate() {
         if (isNull(ingredient) || !ingredient.isValid()) {
             throw new BusinessException(INGREDIENT_NOT_SELECTED);
+        }
+        if (ingredient.getName().length() > MAX_NAME_LENGTH) {
+            throw new BusinessException(NAME_LENGTH_ERROR);
         }
         if (isNull(unit) || !unit.isValid()) {
             throw new BusinessException(UNIT_NOT_SELECTED);

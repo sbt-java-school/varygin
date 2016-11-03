@@ -37,13 +37,13 @@ public class HomePage implements Control {
     @FXML
     private void search() {
         ModalFactory.create(getClass().getResource("../search/search.fxml"),
-                "Поиск", stage, this);
+                "Поиск", stage, control -> control.setParent(this));
     }
 
     @FXML
     private void create() {
         ModalFactory.create(getClass().getResource("../recipe/create.fxml"),
-                "Добавление рецепта", stage, this);
+                "Добавление рецепта", stage, control -> control.setParent(this));
     }
 
     @FXML

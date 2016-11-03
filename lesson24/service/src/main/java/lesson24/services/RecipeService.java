@@ -11,16 +11,15 @@ import lesson24.exceptions.BusinessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.toList;
-import static lesson24.errors.ValidateMessages.RECIPE_NOT_FOUND;
-import static lesson24.errors.ValidateMessages.RECIPE_NOT_VALID;
-import static lesson24.errors.ValidateMessages.RECIPE_REMOVE_ERROR;
+import static lesson24.errors.ValidateMessages.*;
 
 @Repository
 public class RecipeService {
+    private static final int MAX_NAME_LENGTH = 50;
+    private static final int MAX_DESCRIPTION_LENGTH = 200;
     private final Recipe recipe;
     private List<IngredientService> ingredients;
 
@@ -117,6 +116,12 @@ public class RecipeService {
     private void validate() {
         if (!recipe.isValid()) {
             throw new BusinessException(RECIPE_NOT_VALID);
+        }
+        if (recipe.getName().length() > MAX_NAME_LENGTH) {
+            throw new BusinessException(NAME_LENGTH_ERROR);
+        }
+        if (recipe.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+            throw new BusinessException(DESCRIPTION_LENGTH_ERROR);
         }
     }
 

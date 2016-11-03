@@ -13,10 +13,52 @@
 
     <properties>
         <mysql.version>6.0.4</mysql.version>
+        <h2.version>1.4.192</h2.version>
         <spring.version>4.3.3.RELEASE</spring.version>
+        <resource.path>src/main/resources</resource.path>
     </properties>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>${resource.path}</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>mysql</id>
+            <properties>
+                <driver>mysql</driver>
+                <host>//localhost</host>
+                <db_name>recipes_store</db_name>
+                <db_user>cook</db_user>
+                <db_password>q1w2e3</db_password>
+            </properties>
+        </profile>
+        <profile>
+            <id>h2</id>
+            <properties>
+                <driver>h2</driver>
+                <host>${project.basedir}</host>
+                <db_name>recipes_store</db_name>
+                <db_user></db_user>
+                <db_password></db_password>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
     <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

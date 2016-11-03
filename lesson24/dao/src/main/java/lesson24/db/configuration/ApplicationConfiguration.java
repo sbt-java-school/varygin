@@ -1,5 +1,6 @@
 package lesson24.db.configuration;
 
+import lesson24.db.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @ComponentScan(basePackages = "lesson24.db.components")
 public class ApplicationConfiguration {
-    private static final Config config = JdbcMySQLConfig.getInstance();
+    private static final Config config = JdbcConfig.getInstance();
 
     @Bean
     public DataSource dataSource() {

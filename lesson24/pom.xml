@@ -25,6 +25,7 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+                <version>3.5.1</version>
             </plugin>
         </plugins>
     </build>

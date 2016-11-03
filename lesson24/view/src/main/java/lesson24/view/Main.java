@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lesson24.services.MainService;
 import lesson24.view.views.home.HomePage;
 
 import java.io.IOException;
@@ -22,7 +23,8 @@ public class Main extends Application {
 
     private void initRootLayOut() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("views/home/home.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("views/home/home.fxml"));
             AnchorPane rootLayout = loader.load();
 
             Scene scene = new Scene(rootLayout);
@@ -31,11 +33,12 @@ public class Main extends Application {
             HomePage controller = loader.getController();
             controller.setStage(primaryStage);
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
     public static void main(String[] args) {
+        MainService.createTables();
         launch(args);
     }
 }

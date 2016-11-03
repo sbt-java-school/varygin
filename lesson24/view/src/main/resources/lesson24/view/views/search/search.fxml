@@ -44,7 +44,7 @@
             </AnchorPane>
         </items>
       </SplitPane>
-      <TextField fx:id="query" layoutX="20.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="448.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="140.0" AnchorPane.topAnchor="14.0" />
+      <TextField fx:id="query" layoutX="20.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#search" prefHeight="25.0" prefWidth="448.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="140.0" AnchorPane.topAnchor="14.0" />
       <Button layoutX="483.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#search" prefHeight="25.0" prefWidth="97.0" text="Найти" AnchorPane.rightAnchor="20.0" />
    </children>
 </AnchorPane>

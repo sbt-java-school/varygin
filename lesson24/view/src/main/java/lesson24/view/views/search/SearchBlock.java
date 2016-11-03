@@ -4,19 +4,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import lesson24.db.shema.Recipe;
 import lesson24.services.IngredientService;
 import lesson24.services.RecipeService;
 import lesson24.services.RelationService;
 import lesson24.view.Control;
+import lesson24.view.ModalFactory;
 import lesson24.view.views.home.HomePage;
+import lesson24.view.views.recipe.CreateRecipe;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.*;
 import static javafx.collections.FXCollections.*;
@@ -45,7 +45,7 @@ public class SearchBlock implements Control {
     @FXML
     private TextArea description;
 
-    private ObservableList ingredientsList;
+    private ObservableList<Recipe> recipesList;
 
     public SearchBlock() {
     }
@@ -62,8 +62,8 @@ public class SearchBlock implements Control {
 
     @FXML
     private void initialize() {
-        ingredientsList = observableArrayList(RecipeService.getList());
-        recipes.getItems().addAll(ingredientsList);
+        recipesList = observableArrayList(RecipeService.getList());
+        this.recipes.setItems(recipesList);
         setListView();
     }
 
@@ -86,7 +86,15 @@ public class SearchBlock implements Control {
 
     @FXML
     private void search() {
-        //Filter list by name
+        String param = query.getText().toLowerCase();
+        if (StringUtils.isNotBlank(param)) {
+            List<Recipe> collect = recipesList.stream()
+                    .filter(item -> item.getName().toLowerCase().contains(param))
+                    .collect(Collectors.toList());
+            recipes.setItems(FXCollections.observableList(collect));
+        } else {
+            recipes.setItems(recipesList);
+        }
     }
 
     @FXML
@@ -96,7 +104,16 @@ public class SearchBlock implements Control {
 
     @FXML
     private void edit() {
-        stage.close();
+        Recipe selectedItem = recipes.getSelectionModel().getSelectedItem();
+        if (isNull(selectedItem)) {
+            return;
+        }
+        ModalFactory.create(getClass().getResource("../recipe/create.fxml"),
+                "Редактирование рецепта", stage, controller -> {
+                    controller.setParent(this);
+                    ((CreateRecipe) controller).editRecipe(selectedItem, ingredients);
+                });
+        initialize();
     }
 
     @FXML

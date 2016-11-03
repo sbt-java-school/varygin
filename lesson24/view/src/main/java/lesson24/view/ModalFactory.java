@@ -13,12 +13,13 @@ import lesson24.exceptions.BusinessException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import static javafx.scene.control.Alert.*;
 import static javafx.scene.control.ButtonBar.*;
 
 public class ModalFactory {
-    public static void create(URL resource, String title, Stage owner, Control control) {
+    public static void create(URL resource, String title, Stage owner, Callback callback) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(resource);
@@ -34,7 +35,7 @@ public class ModalFactory {
 
             Control controller = loader.getController();
             controller.setStage(dialogStage);
-            controller.setParent(control);
+            callback.call(controller);
 
             dialogStage.showAndWait();
         } catch (IOException e) {
