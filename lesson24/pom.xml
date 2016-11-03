@@ -11,6 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mysql.version>6.0.4</mysql.version>
+        <h2.version>1.4.192</h2.version>
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.21</slf4j.version>
@@ -36,6 +38,45 @@
         <module>service</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>mysql</id>
+            <properties>
+                <driver>mysql</driver>
+                <host>//localhost</host>
+                <db_name>recipes_store</db_name>
+                <db_user>cook</db_user>
+                <db_password>q1w2e3</db_password>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysql.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>h2</id>
+            <properties>
+                <driver>h2</driver>
+                <host>${project.basedir}</host>
+                <db_name>recipes_store</db_name>
+                <db_user></db_user>
+                <db_password></db_password>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
