@@ -1,4 +1,4 @@
-package lesson24.view;
+package lesson24.view.views;
 
 import javafx.stage.Stage;
 

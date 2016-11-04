@@ -1,9 +1,8 @@
-package lesson24.view;
+package lesson24.view.views;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
@@ -13,12 +12,22 @@ import lesson24.exceptions.BusinessException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
-import static javafx.scene.control.Alert.*;
-import static javafx.scene.control.ButtonBar.*;
+import static javafx.scene.control.Alert.AlertType;
+import static javafx.scene.control.ButtonBar.ButtonData;
 
+/**
+ * Класс генирации модальных окон приолжения
+ */
 public class ModalFactory {
+    /**
+     * Создание нового модального окна приложения
+     *
+     * @param resource URL xml файла представления
+     * @param title название окна
+     * @param owner вызывающее окно
+     * @param callback функция по заполнению содержимого по умолчанию, создаваемого окна
+     */
     public static void create(URL resource, String title, Stage owner, Callback callback) {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -44,7 +53,12 @@ public class ModalFactory {
         }
     }
 
-    public static void error(Stage stage, String message) {
+    /**
+     * Вывод окошка с сообщением об ошибке
+     * @param stage текущее окно
+     * @param message сообщение
+     */
+    private static void error(Stage stage, String message) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.initOwner(stage);
         alert.setTitle("Ошибка");
@@ -54,7 +68,16 @@ public class ModalFactory {
         alert.showAndWait();
     }
 
-    public static void confirm(Stage stage, String message, Runnable forYes, Runnable forNo) {
+    /**
+     * Метод создания окна с подтверждением выполняемых действий
+     *
+     * @param stage текущее окно
+     * @param message задаваемый вопрос
+     * @param forYes действия в случае подтверждения
+     * @param forNo действия в случае отрицания
+     */
+    public static void confirm(Stage stage, String message,
+                               Runnable forYes, Runnable forNo) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.initOwner(stage);
         alert.setTitle("Подтверждение");
@@ -78,6 +101,11 @@ public class ModalFactory {
         }
     }
 
+    /**
+     * Обёртка для единого интерфейса отлова сервисных ошибок
+     * @param action выполняемая функция
+     * @param stage текущее окно
+     */
     public static void wrap(Runnable action, Stage stage) {
         try {
             action.run();

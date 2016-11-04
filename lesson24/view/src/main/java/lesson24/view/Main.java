@@ -10,6 +10,9 @@ import lesson24.view.views.home.HomePage;
 
 import java.io.IOException;
 
+/**
+ * Класс для запуска программы
+ */
 public class Main extends Application {
     private Stage primaryStage;
 
@@ -21,6 +24,9 @@ public class Main extends Application {
         initRootLayOut();
     }
 
+    /**
+     * Создание окна-меню приложения
+     */
     private void initRootLayOut() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass()
@@ -30,6 +36,7 @@ public class Main extends Application {
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.show();
+
             HomePage controller = loader.getController();
             controller.setStage(primaryStage);
         } catch (IOException e) {

@@ -15,7 +15,7 @@
         <h2.version>1.4.192</h2.version>
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
-        <slf4j.version>1.7.21</slf4j.version>
+        <db_global_name>recipes_store</db_global_name>
     </properties>
 
     <build>
@@ -44,7 +44,7 @@
             <properties>
                 <driver>mysql</driver>
                 <host>//localhost</host>
-                <db_name>recipes_store</db_name>
+                <db_name>${db_global_name}</db_name>
                 <db_user>cook</db_user>
                 <db_password>q1w2e3</db_password>
             </properties>
@@ -61,7 +61,7 @@
             <properties>
                 <driver>h2</driver>
                 <host>${project.basedir}</host>
-                <db_name>recipes_store</db_name>
+                <db_name>${db_global_name}</db_name>
                 <db_user></db_user>
                 <db_password></db_password>
             </properties>
@@ -95,12 +95,5 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
     </dependencies>
-
-
 </project>

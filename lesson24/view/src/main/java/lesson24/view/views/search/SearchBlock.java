@@ -5,12 +5,12 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import lesson24.db.shema.Recipe;
+import lesson24.db.sсhema.Recipe;
 import lesson24.services.IngredientService;
 import lesson24.services.RecipeService;
 import lesson24.services.RelationService;
-import lesson24.view.Control;
-import lesson24.view.ModalFactory;
+import lesson24.view.views.Control;
+import lesson24.view.views.ModalFactory;
 import lesson24.view.views.home.HomePage;
 import lesson24.view.views.recipe.CreateRecipe;
 import org.apache.commons.lang.StringUtils;
@@ -22,7 +22,8 @@ import static java.util.Objects.*;
 import static javafx.collections.FXCollections.*;
 
 /**
- * Список рецептов и поиск по названию рецепта
+ * Поиск рецептов и детальная информация
+ * о рецепте с возможностью редактирования
  */
 public class SearchBlock implements Control {
     private Stage stage;
@@ -64,6 +65,9 @@ public class SearchBlock implements Control {
     private void initialize() {
         recipesList = observableArrayList(RecipeService.getList());
         this.recipes.setItems(recipesList);
+        title.setText("");
+        description.setText("");
+        ingredients.setItems(FXCollections.emptyObservableList());
         setListView();
     }
 

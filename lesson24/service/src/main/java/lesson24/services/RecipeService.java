@@ -1,18 +1,18 @@
 package lesson24.services;
 
-import lesson24.db.components.TransactionRequest;
-import lesson24.db.shema.Recipe;
-import lesson24.db.shema.RecipesToIngredients;
 import lesson24.db.DaoFactory;
 import lesson24.db.Model;
 import lesson24.db.components.RecipesDao;
 import lesson24.db.components.RecipesToIngredientsDao;
+import lesson24.db.components.TransactionRequest;
+import lesson24.db.sсhema.Recipe;
+import lesson24.db.sсhema.RecipesToIngredients;
 import lesson24.exceptions.BusinessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static java.util.Objects.*;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 import static lesson24.errors.ValidateMessages.*;
 
@@ -20,6 +20,7 @@ import static lesson24.errors.ValidateMessages.*;
 public class RecipeService {
     private static final int MAX_NAME_LENGTH = 50;
     private static final int MAX_DESCRIPTION_LENGTH = 200;
+
     private final Recipe recipe;
     private List<IngredientService> ingredients;
 
@@ -44,10 +45,10 @@ public class RecipeService {
         validate();
 
         try (DaoFactory factory = new DaoFactory()) {
-            factory.create(TransactionRequest.class).action(() -> {
+            factory.get(TransactionRequest.class).action(() -> {
                 List<RecipesToIngredients> relations;
-                Model recipesDao = factory.create(RecipesDao.class);
-                RecipesToIngredientsDao relationsDao = factory.create(RecipesToIngredientsDao.class);
+                Model recipesDao = factory.get(RecipesDao.class);
+                RecipesToIngredientsDao relationsDao = factory.get(RecipesToIngredientsDao.class);
 
                 if (recipe.getId() != null) {
                     recipesDao.update(recipe);
@@ -135,9 +136,9 @@ public class RecipeService {
             throw new BusinessException(RECIPE_NOT_FOUND);
         }
         try (DaoFactory factory = new DaoFactory()) {
-            factory.create(TransactionRequest.class).action(() -> {
-                Model recipesDao = factory.create(RecipesDao.class);
-                Model recipesToIngredientsDao = factory.create(RecipesToIngredientsDao.class);
+            factory.get(TransactionRequest.class).action(() -> {
+                Model recipesDao = factory.get(RecipesDao.class);
+                Model recipesToIngredientsDao = factory.get(RecipesToIngredientsDao.class);
 
                 if (!recipesDao.remove(recipe.getId())) {
                     throw new BusinessException(RECIPE_REMOVE_ERROR);
@@ -164,9 +165,14 @@ public class RecipeService {
         recipe.setDescription(description);
     }
 
+    /**
+     * Получение списка рецептов из БД
+     *
+     * @return список рецептов, находящихся в БД
+     */
     public static List<Recipe> getList() {
         try (DaoFactory factory = new DaoFactory()) {
-            Model recipesDao = factory.create(RecipesDao.class);
+            Model recipesDao = factory.get(RecipesDao.class);
             List<?> modelsList = recipesDao.getList();
             return modelsList.stream()
                     .map(item -> (Recipe) item)

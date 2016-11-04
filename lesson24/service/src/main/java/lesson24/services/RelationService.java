@@ -2,16 +2,15 @@ package lesson24.services;
 
 import lesson24.db.DaoFactory;
 import lesson24.db.components.RecipesToIngredientsDao;
-import lesson24.db.shema.Ingredient;
-import lesson24.db.shema.Unit;
+import lesson24.db.sсhema.Ingredient;
+import lesson24.db.sсhema.Unit;
 import lesson24.exceptions.BusinessException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 public class RelationService {
 
@@ -26,16 +25,22 @@ public class RelationService {
 
         Objects.requireNonNull(ingredient);
         try (DaoFactory factory = new DaoFactory()) {
-            RecipesToIngredientsDao recipesToIngredients = factory.create(RecipesToIngredientsDao.class);
+            RecipesToIngredientsDao recipesToIngredients = factory.get(RecipesToIngredientsDao.class);
             recipesToIngredients.removeByKey("ingredient_id", ingredient.getId());
         } catch (Exception e) {
             throw new BusinessException(e);
         }
     }
 
+    /**
+     * Получение списка ингредиентов по идентификатору рецепта
+     *
+     * @param recipe_id идентификатор рецепта
+     * @return список ингредиентов
+     */
     public static List<IngredientService> getIngredientsByRecipeId(Long recipe_id) {
         try (DaoFactory factory = new DaoFactory()) {
-            RecipesToIngredientsDao recipesToIngredients = factory.create(RecipesToIngredientsDao.class);
+            RecipesToIngredientsDao recipesToIngredients = factory.get(RecipesToIngredientsDao.class);
             List<Map<String, Object>> resultList = recipesToIngredients.getByRecipeId(recipe_id);
             return resultList.stream()
                     .map(resultMap -> {

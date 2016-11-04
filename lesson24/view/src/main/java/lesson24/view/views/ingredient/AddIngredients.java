@@ -6,17 +6,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import lesson24.db.shema.Ingredient;
-import lesson24.db.shema.Unit;
-import lesson24.exceptions.BusinessException;
+import lesson24.db.sсhema.Ingredient;
+import lesson24.db.sсhema.Unit;
 import lesson24.services.IngredientService;
 import lesson24.services.UnitService;
-import lesson24.view.Control;
-import lesson24.view.ModalFactory;
+import lesson24.view.views.Control;
+import lesson24.view.views.ModalFactory;
 import lesson24.view.views.recipe.CreateRecipe;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
+/**
+ * Контроллер добавления ингредиентов в рецепт
+ */
 public class AddIngredients implements Control {
     private CreateRecipe control;
     private Stage stage;

@@ -3,8 +3,8 @@ package lesson24.services;
 import lesson24.db.DaoFactory;
 import lesson24.db.Model;
 import lesson24.db.components.IngredientsDao;
-import lesson24.db.shema.Ingredient;
-import lesson24.db.shema.Unit;
+import lesson24.db.sсhema.Ingredient;
+import lesson24.db.sсhema.Unit;
 import lesson24.exceptions.BusinessException;
 import org.apache.commons.lang.text.StrBuilder;
 import org.springframework.dao.DuplicateKeyException;
@@ -71,7 +71,7 @@ public class IngredientService {
 
         try (DaoFactory factory = new DaoFactory()) {
             if (ingredient.getId() == null) {
-                Long id = factory.create(IngredientsDao.class).create(ingredient);
+                Long id = factory.get(IngredientsDao.class).create(ingredient);
                 ingredient.setId(id);
             }
         } catch (DuplicateKeyException e) {
@@ -112,7 +112,7 @@ public class IngredientService {
         }
 
         try (DaoFactory factory = new DaoFactory()) {
-            if (!factory.create(IngredientsDao.class).remove(ingredient.getId())) {
+            if (!factory.get(IngredientsDao.class).remove(ingredient.getId())) {
                 throw new BusinessException(INGREDIENT_REMOVE_ERROR);
             }
         } catch (Exception e) {
@@ -127,7 +127,7 @@ public class IngredientService {
      */
     public static List<Ingredient> getList() {
         try (DaoFactory factory = new DaoFactory()) {
-            Model ingredientsDao = factory.create(IngredientsDao.class);
+            Model ingredientsDao = factory.get(IngredientsDao.class);
             List<?> ingredientsDaoList = ingredientsDao.getList();
 
             return ingredientsDaoList.stream()

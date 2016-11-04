@@ -2,18 +2,22 @@ package lesson24.view.views.recipe;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import lesson24.db.shema.Recipe;
+import lesson24.db.sсhema.Recipe;
 import lesson24.exceptions.BusinessException;
 import lesson24.services.IngredientService;
 import lesson24.services.RecipeService;
 import lesson24.services.RelationService;
-import lesson24.view.Control;
-import lesson24.view.ModalFactory;
-import lesson24.view.views.home.HomePage;
-import lesson24.view.views.ingredient.AddIngredients;
+import lesson24.view.views.Control;
+import lesson24.view.views.ModalFactory;
 
+/**
+ * Контроллер добавления рецепта
+ */
 public class CreateRecipe implements Control {
     private Stage stage;
     private Control control;
@@ -57,7 +61,9 @@ public class CreateRecipe implements Control {
     public void addIngredient(IngredientService ingredient) {
         ObservableList<IngredientService> items = ingredients.getItems();
         boolean result = items.stream().anyMatch(item ->
-                item.getIngredient().getName().equals(ingredient.getIngredient().getName()));
+                item.getIngredient()
+                        .getName()
+                        .equals(ingredient.getIngredient().getName()));
         if (result) {
             throw new BusinessException("Вы уже добавили этот ингредиент");
         }
@@ -77,9 +83,11 @@ public class CreateRecipe implements Control {
     private void save() {
         ModalFactory.wrap(() -> {
             if (recipeService == null) {
-                recipeService = new RecipeService(recipeName.getText(), recipeDescription.getText());
+                recipeService = new RecipeService(recipeName.getText(),
+                        recipeDescription.getText());
             } else {
-                recipeService.setFields(recipeName.getText(), recipeDescription.getText());
+                recipeService.setFields(recipeName.getText(),
+                        recipeDescription.getText());
             }
             recipeService.setIngredients(ingredients.getItems());
             recipeService.save();
@@ -101,7 +109,8 @@ public class CreateRecipe implements Control {
             if (ingredients.getItems().isEmpty()) {
                 throw new BusinessException("Список ингредиентов пуст");
             }
-            ObservableList<IngredientService> selectedItems = ingredients.getSelectionModel().getSelectedItems();
+            ObservableList<IngredientService> selectedItems = ingredients
+                    .getSelectionModel().getSelectedItems();
             if (selectedItems.isEmpty()) {
                 throw new BusinessException("Не выбрано ни одного ингредиента");
             }

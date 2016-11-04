@@ -3,9 +3,12 @@ package lesson24.view.views.home;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import lesson24.view.Control;
-import lesson24.view.ModalFactory;
+import lesson24.view.views.Control;
+import lesson24.view.views.ModalFactory;
 
+/**
+ * Контроллер главной страницы приложения
+ */
 public class HomePage implements Control {
     private Control control;
     @FXML

@@ -5,8 +5,8 @@ import lesson24.db.Model;
 import lesson24.db.components.IngredientsDao;
 import lesson24.db.components.RecipesDao;
 import lesson24.db.components.RecipesToIngredientsDao;
-import lesson24.db.shema.Recipe;
-import lesson24.db.shema.Unit;
+import lesson24.db.sсhema.Recipe;
+import lesson24.db.sсhema.Unit;
 import lesson24.exceptions.BusinessException;
 import lesson24.services.IngredientService;
 import lesson24.services.RecipeService;
@@ -39,7 +39,7 @@ public class TestCreatingRecipe {
             fail();
         } catch (BusinessException e) {
             try (DaoFactory factory = new DaoFactory()) {
-                Model recipesDao = factory.create(RecipesDao.class);
+                Model recipesDao = factory.get(RecipesDao.class);
                 List<?> listOptional = recipesDao.getList("name", "test");
                 assertTrue(listOptional.isEmpty());
             }
@@ -59,6 +59,7 @@ public class TestCreatingRecipe {
     }
 
     @Test
+    @Ignore
     public void createAndDelete() {
         RecipeService recipeService = new RecipeService("test", "descr");
         Unit unit = new Unit(1L, "test1", "ttt");
@@ -72,16 +73,16 @@ public class TestCreatingRecipe {
         recipeService.save();
 
         try (DaoFactory factory = new DaoFactory()) {
-            IngredientsDao ingredientsDao = factory.create(IngredientsDao.class);
+            IngredientsDao ingredientsDao = factory.get(IngredientsDao.class);
             List<?> ingList = ingredientsDao.getList("id", ingredients.get(0).getIngredient().getId().toString());
             assertTrue(!ingList.isEmpty());
 
-            Model recipesDao = factory.create(RecipesDao.class);
+            Model recipesDao = factory.get(RecipesDao.class);
             List<?> listOptional = recipesDao.getList("name", "test");
             assertTrue(!listOptional.isEmpty());
             Recipe recipe = (Recipe) listOptional.get(0);
 
-            RecipesToIngredientsDao recipesToIngredients = factory.create(RecipesToIngredientsDao.class);
+            RecipesToIngredientsDao recipesToIngredients = factory.get(RecipesToIngredientsDao.class);
             List<?> rtiList = recipesToIngredients.getList("recipe_id", recipe.getId().toString());
             assertTrue(!rtiList.isEmpty());
 
