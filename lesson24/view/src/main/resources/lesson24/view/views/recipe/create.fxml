@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="358.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lesson24.view.views.recipe.CreateRecipe">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" text="Название">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="recipeName" layoutX="14.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="344.0" />
+      <Label layoutX="14.0" layoutY="82.0" text="Описание">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextArea fx:id="recipeDescription" layoutX="14.0" layoutY="107.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="344.0" />
+      <ListView fx:id="ingredients" layoutX="385.0" layoutY="72.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="235.0" prefWidth="200.0" />
+      <Label layoutX="386.0" layoutY="14.0" text="Ингредиенты">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Button fx:id="saveRecipeButton" layoutX="470.0" layoutY="319.0" mnemonicParsing="false" onAction="#save" text="Сохранить рецепт" />
+      <Button fx:id="addIngredientsButton" layoutX="517.0" layoutY="39.0" mnemonicParsing="false" onAction="#addIngredients" text="Добавить" />
+      <Button fx:id="cancelButton" layoutX="14.0" layoutY="319.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#cancel" text="Вернуться в меню" />
+      <Button fx:id="removeIngredientButton" layoutX="385.0" layoutY="39.0" mnemonicParsing="false" onAction="#removeIngredients" text="Удалить " />
+   </children>
+</AnchorPane>
