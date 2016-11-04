@@ -35,4 +35,23 @@
 
 Немного скриншотов:
 
-![Image alt] (http://joxi.ru/zANdBa1hleNJxm)
+Главная
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/5c1f489643.jpg)
+
+Добавление рецепта
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/982c3a7fac.jpg)
+
+Обработка ошибок
+![alt tag] (http://dl1.joxi.net/drive/2016/11/04/0014/1533/939517/17/ec47d41e51.jpg)
+
+Добавление ингредиента в рецепт
+![alt tag] (http://dl1.joxi.net/drive/2016/11/04/0014/1533/939517/17/a22e23b72d.jpg)
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/cc145a3777.jpg)
+
+Поиск
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/6a57cc4598.jpg)
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/e3c84a8ab0.jpg)
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/59446d4d4e.jpg)
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/5285788cbc.jpg)
+![alt tag] (http://dl2.joxi.net/drive/2016/11/04/0014/1533/939517/17/4a0e01dcff.jpg)
+
