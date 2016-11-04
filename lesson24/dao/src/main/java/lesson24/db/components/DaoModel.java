@@ -1,7 +1,7 @@
 package lesson24.db.components;
 
 import lesson24.db.Model;
-import lesson24.db.shema.TableField;
+import lesson24.db.sсhema.TableField;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -19,6 +19,10 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Абстрактный класс для реализации общих методов
+ * для взаимодействия модели с БД.
+ */
 abstract class DaoModel implements Model {
     final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -39,7 +43,7 @@ abstract class DaoModel implements Model {
     @Override
     public Long create(Object model) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(model);
-        List<String> classFields = getClassFields(model);
+        List<String> classFields = getClassFields(model.getClass());
         String[] wrapFields = classFields.stream()
                 .map(field -> "`" + field + "`").toArray(String[]::new);
         String[] values = classFields.stream()
@@ -57,9 +61,9 @@ abstract class DaoModel implements Model {
     @Override
     public boolean update(Object model) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(model);
-        List<String> classFields = getClassFields(model);
+        List<String> classFields = getClassFields(model.getClass());
         String[] wrapFields = classFields.stream()
-                .map(field -> "`" + field + "` = :" +  field)
+                .map(field -> "`" + field + "` = :" + field)
                 .toArray(String[]::new);
         String query = "UPDATE " + getTable()
                 + " SET " + StringUtils.join(wrapFields, ",")
@@ -89,10 +93,13 @@ abstract class DaoModel implements Model {
         return delete == 1;
     }
 
-    private List<String> getClassFields(Object model) {
-        return getClassFields(model.getClass());
-    }
-
+    /**
+     * Метод для получения всех полей модели с аннотацией @TableField
+     * Может быть переопределена классами потомками
+     *
+     * @param aClass класс модели
+     * @return список полей с аннотацией @TableField
+     */
     List<String> getClassFields(Class<?> aClass) {
         return Stream.of(aClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(TableField.class))
@@ -100,7 +107,20 @@ abstract class DaoModel implements Model {
                 .collect(toList());
     }
 
+    /**
+     * Контракт на получение названия таблицы для формирования запроса
+     *
+     * @return название таблицы
+     */
     protected abstract String getTable();
 
+    /**
+     * Контракт на инициализацию получаемого из БД объекта конкретным
+     * контроллером, вызвавшим запрос на выборку, так как он знает
+     * как создавать объект, который ему принадлежит.
+     *
+     * @param resultMap карта значений объекта
+     * @return необходимый объект
+     */
     protected abstract Object init(Map<String, Object> resultMap);
 }

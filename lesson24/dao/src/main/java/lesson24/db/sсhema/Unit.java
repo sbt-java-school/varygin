@@ -1,7 +1,10 @@
-package lesson24.db.shema;
+package lesson24.db.sсhema;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
+/**
+ * Модель таблицы единиц измерения
+ */
 public class Unit {
     private Long id;
     @TableField

@@ -1,7 +1,7 @@
 package lesson24.db.components;
 
 /**
- *
+ * Перечисление названий таблиц базы данных
  */
 enum Tables {
     RECIPES("recipes"),

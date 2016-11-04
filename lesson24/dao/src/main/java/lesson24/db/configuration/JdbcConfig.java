@@ -1,5 +1,8 @@
 package lesson24.db.configuration;
 
+/**
+ * Реализация конфигурации приложения
+ */
 public class JdbcConfig extends AbstractConfig {
     private static final JdbcConfig INSTANCE = new JdbcConfig();
 

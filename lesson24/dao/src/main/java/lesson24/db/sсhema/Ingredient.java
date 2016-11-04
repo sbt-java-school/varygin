@@ -1,14 +1,14 @@
-package lesson24.db.shema;
+package lesson24.db.sсhema;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
+/**
+ * Модель таблицы ингредиентов
+ */
 public class Ingredient {
     private Long id;
     @TableField
     private String name;
-
-    public Ingredient() {
-    }
 
     public Ingredient(String name) {
         this(null, name);

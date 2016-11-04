@@ -1,5 +1,9 @@
-package lesson24.db.shema;
+package lesson24.db.sсhema;
 
+/**
+ * Модель таблицы взаимодействия между
+ * таблицей рецептов и ингредиентов
+ */
 public class RecipesToIngredients {
     @TableField
     private Long recipe_id;

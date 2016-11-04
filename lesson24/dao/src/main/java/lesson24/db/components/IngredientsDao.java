@@ -1,6 +1,6 @@
 package lesson24.db.components;
 
-import lesson24.db.shema.Ingredient;
+import lesson24.db.sсhema.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.Optional;
 
-import static lesson24.db.components.Tables.*;
+import static lesson24.db.components.Tables.INGREDIENTS;
 
 @Repository
 public class IngredientsDao extends DaoModel {
@@ -29,7 +29,7 @@ public class IngredientsDao extends DaoModel {
         if (!optionalObj.isPresent()) {
             return Optional.empty();
         }
-        return Optional.of((Ingredient)optionalObj.get());
+        return Optional.of((Ingredient) optionalObj.get());
     }
 
     @Override

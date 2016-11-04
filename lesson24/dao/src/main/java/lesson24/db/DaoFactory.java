@@ -16,7 +16,7 @@ public class DaoFactory implements Closeable {
         this.context = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
     }
 
-    public <T> T create(Class<? extends T> aClass) {
+    public <T> T get(Class<? extends T> aClass) {
         return context.getBean(aClass);
     }
 

@@ -1,6 +1,5 @@
 package lesson24.db.configuration;
 
-import lesson24.db.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

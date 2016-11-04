@@ -1,18 +1,16 @@
-package lesson24.db.shema;
+package lesson24.db.sсhema;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-import static org.apache.commons.lang.StringUtils.*;
-
+/**
+ * Модель таблицы рецептов
+ */
 public class Recipe {
     private Long id;
     @TableField
     private String name;
     @TableField
     private String description;
-
-    public Recipe() {
-    }
 
     public Recipe(String name, String description) {
         this(null, name, description);

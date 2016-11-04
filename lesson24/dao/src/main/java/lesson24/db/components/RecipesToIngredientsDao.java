@@ -1,6 +1,6 @@
 package lesson24.db.components;
 
-import lesson24.db.shema.RecipesToIngredients;
+import lesson24.db.sсhema.RecipesToIngredients;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -67,6 +67,16 @@ public class RecipesToIngredientsDao extends DaoModel {
         return removeByKey("recipe_id", recipeId);
     }
 
+    /**
+     * Специфический запрос на удаление записей по определённому полю
+     *
+     * @param field одно из возможных значений:
+     *              recipe_id - идентификатор рецепта
+     *              ingredient_id - идентификатор ингредиента
+     * @param id    значение идентификатор
+     * @return <code>true</code> в случае успешного удаления хотя бы одной строки,
+     * <code>false</code> - иначе
+     */
     public boolean removeByKey(String field, Long id) {
         if (!field.equals("recipe_id") && !field.equals("ingredient_id")) {
             throw new IllegalStateException("Нет такого поля");
@@ -75,9 +85,16 @@ public class RecipesToIngredientsDao extends DaoModel {
         String query = "DELETE FROM " + getTable() + " WHERE " + field + " = :value";
         SqlParameterSource params = new MapSqlParameterSource("value", id);
         int delete = jdbcTemplate.update(query, params);
-        return delete == 1;
+        return delete > 0;
     }
 
+    /**
+     * Специфический запрос на получение списка ингредиентов
+     * по идентификатору рецепта
+     *
+     * @param id идентификатор рецепта
+     * @return список карт ключ - значение
+     */
     public List<Map<String, Object>> getByRecipeId(Long id) {
         Objects.requireNonNull(id);
         SqlParameterSource params = new MapSqlParameterSource("recipe_id", id);
