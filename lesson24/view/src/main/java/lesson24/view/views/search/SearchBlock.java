@@ -112,7 +112,7 @@ public class SearchBlock implements Control {
         if (isNull(selectedItem)) {
             return;
         }
-        ModalFactory.create(getClass().getResource("../recipe/create.fxml"),
+        ModalFactory.create("views\\create.fxml",
                 "Редактирование рецепта", stage, controller -> {
                     controller.setParent(this);
                     ((CreateRecipe) controller).editRecipe(selectedItem, ingredients);

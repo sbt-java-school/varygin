@@ -13,7 +13,6 @@
 
     <properties>
         <spring.version>4.3.3.RELEASE</spring.version>
-        <resource.path>src/main/resources</resource.path>
         <slf4j.version>1.7.21</slf4j.version>
     </properties>
 
@@ -24,6 +23,34 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${resource.path}</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>database.properties</exclude>
+                                        <exclude>log4j.properties</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${basedir}\..\app\</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>

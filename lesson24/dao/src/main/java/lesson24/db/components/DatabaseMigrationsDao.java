@@ -3,6 +3,7 @@ package lesson24.db.components;
 import lesson24.db.DatabaseMigrations;
 import lesson24.db.configuration.JdbcConfig;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -47,7 +49,7 @@ import java.util.stream.Collectors;
 @Repository
 public class DatabaseMigrationsDao implements DatabaseMigrations {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMigrationsDao.class);
-    private static final String CONFIG_FILE = "config.properties";
+    private static final String CONFIG_FILE = "db/config.properties";
     private Properties properties = new Properties();
 
     private final JdbcTemplate template;
@@ -60,6 +62,8 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
 
     @Override
     public void migrate() {
+        String BASE_DIR = "sql/";
+
         try {
             if (isExist()) {
                 return;
@@ -67,13 +71,13 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
             String driver = JdbcConfig.getInstance().getDriver();
             if (needClear) {
                 LOGGER.info("Удаление таблиц");
-                executeScript("sql/drop");
-                executeScript("sql/" + driver + "/ drop");
+                executeScript(BASE_DIR + "drop");
+                executeScript(BASE_DIR + driver + "/drop");
             }
-            LOGGER.info("Создание таблиц");
-            executeScript("sql/" + driver);
-            LOGGER.info("Импорт данных");
-            executeScript("sql/import");
+            LOGGER.info("Creating tables");
+            executeScript(BASE_DIR + driver);
+            LOGGER.info("Import");
+            executeScript(BASE_DIR + "import");
 
             setMigrated();
         } catch (URISyntaxException e) {
@@ -107,25 +111,20 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
     /**
      * Передаёт на чтение файлы из директории path
      *
-     * @param path путь до директории / файла
+     * @param path путь до директории
      */
     private void executeScript(String path) throws URISyntaxException {
-        URL resource = this.getClass().getClassLoader().getResource(path);
-        if (resource != null) {
-            File pathFile = new File(resource.toURI());
-            if (pathFile.isFile()) {
-                executeFile(pathFile);
-            } else if (pathFile.isDirectory()) {
-                Collection<File> files = FileUtils
-                        .listFiles(pathFile, null, false)
-                        .stream()
-                        .sorted((file1, file2) -> file1.getName().compareTo(file2.getName()))
-                        .collect(Collectors.toList());
-                files.forEach(this::executeFile);
-            }
-        } else {
-            LOGGER.info("Директория или файл '" + path + "' не существует");
-            throw new IllegalStateException();
+        LOGGER.info(path);
+
+        File pathFile = new File(path);
+        if (pathFile.isFile()) {
+            executeFile(pathFile);
+        } else if (pathFile.isDirectory()) {
+            List<File> files = FileUtils.listFiles(pathFile, null, false)
+                    .stream()
+                    .sorted((file1, file2) -> file1.getName().compareTo(file2.getName()))
+                    .collect(Collectors.toList());
+            files.forEach(this::executeFile);
         }
     }
 
@@ -136,21 +135,22 @@ public class DatabaseMigrationsDao implements DatabaseMigrations {
      */
     private void executeFile(File file) {
         try {
-            LOGGER.debug("Файл: {}", file.getName());
-            executeSql(FileUtils.readFileToString(file));
+            LOGGER.debug("---------------------------------");
+            LOGGER.info("File: {}", file);
+
+            String sql = FileUtils.readFileToString(file, "UTF-8");
+
+            LOGGER.debug("SQL: " + sql);
+
+            template.execute(sql);
+            LOGGER.debug("---------------------------------");
+
         } catch (DuplicateKeyException e) {
-            LOGGER.debug("Попытка дублирования записи");
-        } catch (SQLException | IOException e) {
-            LOGGER.debug("Ошибка в скрипте: " + file.getName(), e);
+            LOGGER.info("Row already exist");
+        } catch (IOException e) {
+            LOGGER.info("Error reading script: " + file.getName(), e);
             throw new IllegalStateException();
         }
-    }
-
-    private void executeSql(String sql) throws SQLException {
-        LOGGER.debug("-------------Start Migration-------------------");
-        LOGGER.debug("SQL: " + sql);
-        template.execute(sql);
-        LOGGER.debug("-------------Migration complete----------------");
     }
 
     @Override

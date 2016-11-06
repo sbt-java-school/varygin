@@ -97,7 +97,7 @@ public class CreateRecipe implements Control {
 
     @FXML
     private void addIngredients() {
-        ModalFactory.create(getClass().getResource("../ingredient/add.fxml"),
+        ModalFactory.create("views\\add.fxml",
                 "Добавление ингредиента", stage, controller -> {
                     controller.setParent(this);
                 });

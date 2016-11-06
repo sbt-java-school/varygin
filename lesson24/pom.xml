@@ -16,6 +16,7 @@
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
         <db_global_name>recipes_store</db_global_name>
+        <resource.path>src\main\resources</resource.path>
     </properties>
 
     <build>
@@ -60,7 +61,7 @@
             <id>h2</id>
             <properties>
                 <driver>h2</driver>
-                <host>${project.basedir}</host>
+                <host>${basedir}\..\app\db\</host>
                 <db_name>${db_global_name}</db_name>
                 <db_user></db_user>
                 <db_password></db_password>

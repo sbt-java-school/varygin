@@ -8,9 +8,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lesson24.exceptions.BusinessException;
+import lesson24.view.Main;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Optional;
 
 import static javafx.scene.control.Alert.AlertType;
@@ -20,19 +25,23 @@ import static javafx.scene.control.ButtonBar.ButtonData;
  * Класс генирации модальных окон приолжения
  */
 public class ModalFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     /**
      * Создание нового модального окна приложения
      *
-     * @param resource URL xml файла представления
+     * @param fileName название xml файла представления
      * @param title название окна
      * @param owner вызывающее окно
      * @param callback функция по заполнению содержимого по умолчанию, создаваемого окна
      */
-    public static void create(URL resource, String title, Stage owner, Callback callback) {
+    public static void create(String fileName, String title, Stage owner, Callback callback) {
         try {
+            File file = new File(fileName);
+            byte[] bytes = FileUtils.readFileToByteArray(file);
+
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(resource);
-            AnchorPane page = loader.load();
+            AnchorPane page = loader.load(new ByteArrayInputStream(bytes));
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle(title);
@@ -50,6 +59,7 @@ public class ModalFactory {
         } catch (IOException e) {
             ModalFactory.error(owner, "Невозможно создать всплывающее окно, " +
                     "повторите попытку или перезагрузите приложение");
+            LOGGER.debug(e.getMessage());
         }
     }
 

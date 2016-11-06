@@ -7,7 +7,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lesson24.services.MainService;
 import lesson24.view.views.home.HomePage;
+import org.apache.commons.io.FileUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -29,9 +32,11 @@ public class Main extends Application {
      */
     private void initRootLayOut() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass()
-                    .getResource("views/home/home.fxml"));
-            AnchorPane rootLayout = loader.load();
+            File file = new File("views/home.fxml");
+            byte[] bytes = FileUtils.readFileToByteArray(file);
+
+            FXMLLoader loader = new FXMLLoader();
+            AnchorPane rootLayout = loader.load(new ByteArrayInputStream(bytes));
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
