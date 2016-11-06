@@ -66,12 +66,20 @@ class CacheHandler implements InvocationHandler {
     }
 
     private long getCacheTime(Method method) {
-        Cached annotation = method.getAnnotation(Cached.class);
-        if (annotation == null &&
-                (annotation = method.getDeclaringClass().getAnnotation(Cached.class)) == null &&
-                (annotation = instance.getClass().getAnnotation(Cached.class)) == null) {
-            return 0;
+
+        try {
+            Method declaredMethod = instance.getClass()
+                    .getDeclaredMethod(method.getName(), method.getParameterTypes());
+
+            Cached annotation = declaredMethod.getAnnotation(Cached.class);
+            if (annotation == null &&
+                    (annotation = method.getDeclaringClass().getAnnotation(Cached.class)) == null &&
+                    (annotation = instance.getClass().getAnnotation(Cached.class)) == null) {
+                return 0;
+            }
+            return annotation.value();
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(e);
         }
-        return annotation.value();
     }
 }

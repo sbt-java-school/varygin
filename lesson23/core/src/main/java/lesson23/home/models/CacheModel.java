@@ -77,7 +77,8 @@ public class CacheModel extends DBModel {
     }
 
     private Boolean setCacheFromDB(ResultSet result) throws IOException, SQLException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(result.getBlob(3).getBinaryStream())) {
+        try (ObjectInputStream ois = new ObjectInputStream(result
+                .getBlob(3).getBinaryStream())) {
             setId(result.getLong(1));
             setUpdate_at(result.getTimestamp(4));
             Object object = ois.readObject();

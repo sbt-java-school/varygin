@@ -19,6 +19,7 @@ public class Value implements Serializable {
 
     /**
      * Проверка на истечение срока хранения значения в кеше
+     *
      * @return true если время не истекло, false - иначе
      */
     public boolean checkTime() {

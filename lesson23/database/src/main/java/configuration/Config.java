@@ -6,6 +6,7 @@ package configuration;
 public interface Config {
     /**
      * Метод для получения URL для соединения с БД
+     *
      * @return строка
      */
     String getConnectionURL();
