@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet author="laran" id="database-1">
+        <sql>
+            CREATE TABLE UNITS(
+            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            NAME VARCHAR(255) NOT NULL,
+            SHORT_NAME VARCHAR(255) NOT NULL,
+            );
+            CREATE UNIQUE INDEX UQ_NAME_1 ON UNITS (NAME)
+        </sql>
+    </changeSet>
+    <changeSet author="laran" id="database-2">
+        <sql>
+            CREATE TABLE INGREDIENTS(
+            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            NAME VARCHAR(255) NOT NULL,
+            );
+            CREATE UNIQUE INDEX UQ_NAME_INDEX_2 ON INGREDIENTS (NAME)
+        </sql>
+    </changeSet>
+    <changeSet author="laran" id="database-3">
+        <sql>
+            CREATE TABLE RECIPES (
+            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            DESCRIPTION VARCHAR(255),
+            NAME VARCHAR(255) NOT NULL
+            )
+        </sql>
+    </changeSet>
+    <changeSet author="laran" id="database-4">
+        <sql>
+            CREATE TABLE RECIPES_INGREDIENTS
+            (
+            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            RECIPE_ID INTEGER NOT NULL,
+            AMOUNT DOUBLE,
+            INGREDIENT_ID INTEGER NOT NULL,
+            UNIT_ID INTEGER,
+
+            CONSTRAINT PK_RELATION UNIQUE (INGREDIENT_ID, RECIPE_ID),
+            CONSTRAINT FK_RECIPE FOREIGN KEY (RECIPE_ID) REFERENCES RECIPES (ID),
+            CONSTRAINT FK_INGREDIENT FOREIGN KEY (INGREDIENT_ID) REFERENCES INGREDIENTS (ID),
+            CONSTRAINT FK_UNIT FOREIGN KEY (UNIT_ID) REFERENCES UNITS (ID)
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet author="laran" id="database-insert-1">
+        <sqlFile path="import/units.sql" />
+    </changeSet>
+    <changeSet author="laran" id="database-insert-2">
+        <sqlFile path="import/ingredients.sql"/>
+    </changeSet>
+</databaseChangeLog>
