@@ -6,8 +6,8 @@
 
     <changeSet author="laran" id="database-1">
         <sql>
-            CREATE TABLE UNITS(
-            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            CREATE TABLE IF NOT EXISTS UNITS(
+            ID INTEGER (10) AUTO_INCREMENT PRIMARY KEY NOT NULL,
             NAME VARCHAR(255) NOT NULL,
             SHORT_NAME VARCHAR(255) NOT NULL,
             );
@@ -16,8 +16,8 @@
     </changeSet>
     <changeSet author="laran" id="database-2">
         <sql>
-            CREATE TABLE INGREDIENTS(
-            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            CREATE TABLE IF NOT EXISTS INGREDIENTS(
+            ID INTEGER (10) AUTO_INCREMENT PRIMARY KEY NOT NULL,
             NAME VARCHAR(255) NOT NULL,
             );
             CREATE UNIQUE INDEX UQ_NAME_INDEX_2 ON INGREDIENTS (NAME)
@@ -25,22 +25,23 @@
     </changeSet>
     <changeSet author="laran" id="database-3">
         <sql>
-            CREATE TABLE RECIPES (
-            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-            DESCRIPTION VARCHAR(255),
-            NAME VARCHAR(255) NOT NULL
+            CREATE TABLE IF NOT EXISTS RECIPES (
+            ID INTEGER (10) AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            DESCRIPTION VARCHAR(1255),
+            NAME VARCHAR(255) NOT NULL,
+            IMAGE VARCHAR(500) DEFAULT (NULL)
             )
         </sql>
     </changeSet>
     <changeSet author="laran" id="database-4">
         <sql>
-            CREATE TABLE RECIPES_INGREDIENTS
+            CREATE TABLE IF NOT EXISTS RECIPES_INGREDIENTS
             (
-            ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-            RECIPE_ID INTEGER NOT NULL,
-            AMOUNT DOUBLE,
-            INGREDIENT_ID INTEGER NOT NULL,
-            UNIT_ID INTEGER,
+            ID INTEGER (10) AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            RECIPE_ID INTEGER (10) NOT NULL,
+            AMOUNT INTEGER (5),
+            INGREDIENT_ID INTEGER (10) NOT NULL,
+            UNIT_ID INTEGER (10),
 
             CONSTRAINT PK_RELATION UNIQUE (INGREDIENT_ID, RECIPE_ID),
             CONSTRAINT FK_RECIPE FOREIGN KEY (RECIPE_ID) REFERENCES RECIPES (ID),
@@ -55,5 +56,11 @@
     </changeSet>
     <changeSet author="laran" id="database-insert-2">
         <sqlFile path="import/ingredients.sql"/>
+    </changeSet>
+
+    <changeSet author="laran" id="database-6">
+        <createIndex indexName="k_recipe" tableName="RECIPES" unique="true">
+            <column name="name"/>
+        </createIndex>
     </changeSet>
 </databaseChangeLog>

@@ -1,7 +1,7 @@
 package lesson26.home.dao.core;
 
 import lesson26.home.dao.IngredientDao;
-import lesson26.home.dao.schema.Ingredient;
+import lesson26.home.dao.entities.Ingredient;
 import org.springframework.stereotype.Repository;
 
 @Repository

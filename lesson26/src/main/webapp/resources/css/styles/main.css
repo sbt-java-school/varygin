@@ -1,0 +1,51 @@
+body {
+    background-color: #FFF;
+    font-size: 16px;
+    line-height: 1;
+}
+
+#wrapper {
+    position: relative;
+    overflow: hidden;
+    float: none;
+}
+
+#wrapper-inner {
+    max-width: 1024px;
+    margin: 0 auto;
+    display: block;
+    padding: 0 10px;
+}
+
+.clear {
+    clear: both;
+}
+
+button {
+    cursor: pointer;
+    border: 0;
+}
+
+:root {
+    --main-color: #F25806;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--main-color);
+    padding-bottom: 1rem;
+}
+
+h3 {
+    font-weight: bold;
+}
+
+.fa {
+    color: var(--main-color);
+}
+
+.pagination-wrapper {
+    width: 100%;
+    display: inline-block;
+}

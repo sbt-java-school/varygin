@@ -1,7 +1,7 @@
 package lesson26.home.dao.core;
 
 import lesson26.home.dao.RelationDao;
-import lesson26.home.dao.schema.Relation;
+import lesson26.home.dao.entities.Relation;
 import org.springframework.stereotype.Repository;
 
 @Repository

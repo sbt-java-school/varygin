@@ -20,12 +20,24 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+/**
+ * Конфигурационный класс приложения.
+ * Использует файл настроект базы данных
+ * для создания подключения к БД (jdbc.properties).
+ * В файле настроек также находятся настройки Hibernate
+ * для создания менеджера сущностей.
+ * <p>
+ * Для создания базы данных и таблиц используется liquibase
+ * Конфигурационный файл для liquibase - database.xml
+ * SQL файлы импорта начальных ингредиентов и единиц измерения
+ * находятся в папке import ресурсов проекта.
+ */
 @Configuration
 @EnableTransactionManagement
 @PropertySource("classpath:jdbc.properties")
 @ComponentScan("lesson26.home.dao")
 public class DaoConfig {
-    private static final String PACKAGE_TO_SCAN = "lesson26.home.dao.schema";
+    private static final String PACKAGE_TO_SCAN = "lesson26.home.dao.entities";
 
     private final Environment environment;
 
@@ -73,13 +85,22 @@ public class DaoConfig {
     }
 
     @Bean
-    public SpringLiquibase liquibase(DataSource dataSource)  {
+    public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
 
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:database.xml");
 
         return liquibase;
+    }
+
+    @Bean
+    public String staticPath() {
+        String staticPath = environment.getProperty("site.static.path");
+        if (staticPath.isEmpty()) {
+            staticPath = System.getProperty("user.dir");
+        }
+        return staticPath;
     }
 
     private Properties additionalProperties() {

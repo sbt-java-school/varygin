@@ -1,10 +1,11 @@
 package lesson26.home.dao;
 
-import lesson26.home.utils.BusinessException;
+import lesson26.home.dao.core.IngredientDaoImpl;
 
+/**
+ * Интерфейс для взаимодействия с таблицей ингредиентов
+ *
+ * @see IngredientDaoImpl
+ */
 public interface IngredientDao extends EntityDao {
-    @Override
-    default Object getById(Long id) {
-        throw new BusinessException("Операция не поддерживается");
-    }
 }

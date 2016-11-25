@@ -1,110 +1,126 @@
-(function ($) {
-    $(document).ready(function () {
-        WB.initRecipe();
-        WB.initRemoveRecipe();
-        WB.initRecipeAddForm();
-        WB.initIngredientToRecipeAddForm();
-    });
+$(document).ready(function () {
+    WB.addRecipe();
+    WB.addIngredient();
+    WB.addUnit();
+});
 
-    var WB = {
-        errors: '.error-area',
-        path: '/ajax/',
+var WB = $.extend(WB = WB || {}, {
+    errors: '.alert',
+    path: '/ajax/',
+    emptyImg: '/resources/img/empty-image.png',
 
-        initRecipe: function () {
-            var list = $('.ingredients-list');
 
-            if (list.length == 0) {
-                return;
+    initRecipe: function () {
+        $(document).ready(function () {
+            var element = $('#element'),
+                id = element.data('id');
+            WB.editRecipe(id);
+            WB.removeRecipe(id);
+            WB.ingredientToRecipeAddForm();
+            WB.removeIngredientFromRecipe();
+            WB.removeRecipeImage(id);
+        });
+    },
+
+    _itemsHandler: function (modal, type, editAction) {
+        var block = modal.find('.content-inner');
+
+        var deleteItem = function (item) {
+            var typeName = "ингредиент";
+            if (type == 'unit') {
+                typeName = 'единицу измерения';
             }
+            var text = "Вы точно хотите удалить " + typeName + " '" +
+                item.find('span').text() + "' ?";
+            if (confirm(text)) {
+                WB._sendQuery(type + '/remove', {id: item.data("id")},
+                    function (rtData) {
+                        item.remove();
+                    }, modal, 'DELETE'
+                );
+            }
+        };
 
-            list.find('.remove-item')
-                .off()
-                .on('click', function (event) {
+        var init = function () {
+            block.find('.remove-item').off().on('click', function (event) {
                 event.preventDefault();
 
-                var block = $(this).parent();
-                WB._sendQuery('remove/ingredient', {id: block.data("id")},
-                    function (rtData) {
-                        block.remove();
-                    }
-                )
-            })
-        },
-
-        initIngredientToRecipeAddForm: function () {
-            WB._initFrom($('#recipe-ingredients'), function (rtData) {
-                var ingredient = rtData.value;
-                $('.ingredients-list').append(
-                    '<li data-id="' + ingredient.id + '">' +
-                        '<span>' + ingredient.name + '</span>' +
-                        '<button class="remove-item">Удалить</button>' +
-                    '</li>');
-                $('#amount').val('');
-                WB.initRecipe();
+                deleteItem($(this).parent());
             });
-        },
 
-        initRecipeAddForm: function () {
-            WB._initFrom($('#recipe-add-form'), function (rtData) {
-                location.href = '/recipe/index/' + rtData.value;
-            });
-        },
-
-        initRemoveRecipe: function () {
-            var items = $('.remove-recipe');
-
-            if (items.length == 0) {
-                return;
-            }
-
-            items.on('click', function (event) {
+            block.find('.edit-item').off().on('click', function (event) {
                 event.preventDefault();
 
-                var block = $(this).closest('tr');
-                var that = $(this);
-                WB._sendQuery('remove/recipe', {id: that.data('id')},
-                    function (rtData) {
-                        block.remove();
-                    }
-                )
+                editAction($(this).parent());
             });
-        },
 
-        _sendQuery: function (url, data, callback, method) {
-            $.ajax({
-                contentType: "application/json; charset=utf-8",
-                url: WB.path + url,
-                dataType: 'json',
-                type: (method == undefined) ? 'POST' : method,
-                data: JSON.stringify(data),
-                success: function (rtData) {
-                    if (parseInt(rtData.success) == 1) {
-                        callback(rtData);
-                    } else {
-                        $(WB.errors).html(rtData.errors);
-                    }
+            block.find('.pagination a').off().on('click', function (event) {
+                event.preventDefault();
+
+                getList($(this).data('page'));
+            });
+        };
+
+        var getList = function (page) {
+            WB._sendQuery(type + '/list?page=' + page, undefined,
+                function (rtData) {
+                    block.html(rtData);
+                    init();
+                },
+                modal, 'GET'
+            );
+        };
+
+        getList(0);
+    },
+
+    _sendQuery: function (url, data, success, context, method) {
+        context = (context == undefined) ? $("#content") : context;
+        method = (method == undefined) ? 'POST' : method;
+        var errorDiv = context.find(WB.errors);
+
+        errorDiv.addClass('hide');
+        $.ajax({
+            contentType: "application/json; charset=utf-8",
+            url: WB.path + url,
+            dataType: (method == 'GET') ? 'html' : 'json',
+            type: method,
+            data: (data != undefined) ? JSON.stringify(data) : {},
+            success: function (rtData) {
+                if (method == "GET" || parseInt(rtData.success) == 1) {
+                    success(rtData);
+                } else {
+                    errorDiv.removeClass('hide').html(rtData.errors);
                 }
-            });
-        },
-
-        _prepareData: function (form) {
-            var data = {};
-            $.each(form.serializeArray(), function (i, item) {
-                data[item.name] = item.value;
-            });
-            return data;
-        },
-
-        _initFrom: function (form, callback) {
-            if (form.length == 0) {
-                return;
+            },
+            error: function (rtData) {
+                errorDiv.removeClass('hide').html("Ошибка в запросе");
             }
+        });
+    },
 
-            form.on('submit', function (event) {
-                event.preventDefault();
+    _prepareData: function (form) {
+        var data = {};
+        $.each(form.serializeArray(), function (i, item) {
+            data[item.name] = item.value;
+        });
+        return data;
+    },
 
-                WB._sendQuery(form.attr('action'), WB._prepareData(form), callback);
-            });
+    _initFrom: function (form, callback) {
+        if (form.length == 0) {
+            return;
         }
-    };
-})(jQuery);
+
+        form.on('submit', function (event) {
+            event.preventDefault();
+
+            WB._sendQuery(
+                form.attr('action'),
+                WB._prepareData(form),
+                callback,
+                form
+            );
+        });
+    }
+});

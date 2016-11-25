@@ -9,14 +9,23 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Класс валидации объектов
+ */
 public class ValidationFrom {
+    /** Список возникших в процессе валидации ошибок */
     private List<String> errors;
+    /** Экземпляр валидируемого объекта */
     private Object object;
 
     public ValidationFrom(Object object) {
         this.object = object;
     }
 
+    /**
+     * Метод запуска процесса валидации
+     * @return true - в случае отсутствия ошибок при валидации объекта, false - иначе
+     */
     public boolean isValid() {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
@@ -24,9 +33,7 @@ public class ValidationFrom {
         if (Objects.isNull(object)) {
             throw new BusinessException("Объект не найден");
         }
-        Set<ConstraintViolation<Object>> constraintViolations = validator
-                .validate(object);
-
+        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
         if (constraintViolations.size() == 0) {
             return true;
         }

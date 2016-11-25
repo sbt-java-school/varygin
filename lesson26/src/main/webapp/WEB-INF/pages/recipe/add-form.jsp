@@ -1,26 +1,31 @@
 <%@ page language="java" contentType="text/html; charset=utf8" pageEncoding="utf8" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ include file="/WEB-INF/pages/layout/header.jsp" %>
 
-<%@ include file="/WEB-INF/pages/utils/errors.jsp" %>
-
-<form:form method="post" action="add/recipe" commandName="recipe" id="recipe-add-form">
-    <table>
-        <tr>
-            <td><form:label path="name">Название</form:label></td>
-            <td><form:input path="name" value='<%=request.getParameter("name")%>'/></td>
-        </tr>
-        <tr>
-            <td valign="top"><form:label path="description">Описание</form:label></td>
-            <td>
-                <form:textarea cols="80" rows="10" path="description"
-                        value='<%=request.getParameter("description")%>'/>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><input type="submit" value="Сохранить"/></td>
-        </tr>
-    </table>
-</form:form>
-<%@ include file="/WEB-INF/pages/layout/footer.jsp" %>
+<div id="add-recipe" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Рецепт</h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="recipe/add" id="recipe-add-form">
+                    <div class="alert alert-danger hide"></div>
+                    <input type="hidden" name="id" id="recipeId" value=""/>
+                    <div class="form-group">
+                        <input class="form-control" type="text" autofocus name="name" id="name" placeholder="Название"/>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control"
+                                  name="description"
+                                  id="description"
+                                  placeholder="Способ приготовления"
+                                  rows="6"></textarea>
+                    </div>
+                    <div class=text-right>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
